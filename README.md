@@ -1,11 +1,8 @@
-# simple8b-timeseries-compression
+# sensor-compression
 
-C++ implementation of Simple8b compression & decompression algorithms for integer time series. Also includes delta encoding/decoding and zig-zag encoding/decoding routines.
+Lightweight utilities for compressing sensor time series data.
 
-Adapted from https://github.com/lemire/FastPFor (Apache License Version 2.0).
+Includes c++ implementation of Simple8b, delta, and zig-zag encoding/decoding.
 
-Modified to make methods generic over integer bit-width and support longer arrays (up to 2^64 in length).
+Forked from https://github.com/naturalplasmoid/simple8b-timeseries-compression, adapted from https://github.com/lemire/FastPFor, (Apache License Version 2.0)
 
-Coming soon:
-- test cases, example usage, and documentation
-- support/examples for invoking via FFI from JavaScript (WebAssembly), Python, and C#
