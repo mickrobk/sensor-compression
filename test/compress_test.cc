@@ -14,3 +14,11 @@ TEST(CompressTest, delta) {
   DeltaDecode(foo, 5);
   EXPECT_THAT(foo, ::testing::ElementsAre(1, 2, 3, 2, 12));
 }
+
+TEST(CompressTest, zigzag) {
+  int64_t foo[] = {0, 1, 2, 4, -2, -1};
+  ZigZagEncode(foo, 6);
+  EXPECT_THAT(foo, ::testing::ElementsAre(0, 2, 4, 8, 3, 1));
+  ZigZagDecode(foo, 6);
+  EXPECT_THAT(foo, ::testing::ElementsAre(0, 1, 2, 4, -2, -1));
+}

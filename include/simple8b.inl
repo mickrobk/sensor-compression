@@ -87,188 +87,188 @@ inline uint32_t GetSelectorNum(const uint64_t *const in) {
 
 template <typename T>
 size_t Simple8bEncode(T *input, size_t inputLength, uint64_t *out) {
-  uint32_t NumberOfValuesCoded = 0;
+  uint32_t numberOfValuesCoded = 0;
   const uint64_t *const initout = out;
-  size_t ValuesRemaining(inputLength);
+  size_t valuesRemaining(inputLength);
 
-  while (ValuesRemaining >= 240) {
+  while (valuesRemaining >= 240) {
     if (TryPackFast<120, 0>(input)) {
       if (TryPackFast<120, 0>(input + 120)) {
-        NumberOfValuesCoded = 240;
+        numberOfValuesCoded = 240;
         out[0] = 0;
-        input += NumberOfValuesCoded;
+        input += numberOfValuesCoded;
       } else {
-        NumberOfValuesCoded = 120;
+        numberOfValuesCoded = 120;
         out[0] = 1ULL << (64 - SIMPLE8B_SELECTOR_BITS);
-        input += NumberOfValuesCoded;
+        input += numberOfValuesCoded;
       }
     } else if (TryPackFast<60, 1>(input)) {
       out[0] = 2;
-      NumberOfValuesCoded = 60;
+      numberOfValuesCoded = 60;
       for (uint32_t i = 0; i < 60; i++) {
         WriteBits(out, *input++, 1);
       }
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 1 * 60;
     } else if (TryPackFast<30, 2>(input)) {
       out[0] = 3;
-      NumberOfValuesCoded = 30;
+      numberOfValuesCoded = 30;
       for (uint32_t i = 0; i < 30; i++) WriteBits(out, *input++, 2);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 2 * 30;
     } else if (TryPackFast<20, 3>(input)) {
       out[0] = 4;
-      NumberOfValuesCoded = 20;
+      numberOfValuesCoded = 20;
       for (uint32_t i = 0; i < 20; i++) WriteBits(out, *input++, 3);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 3 * 20;
     } else if (TryPackFast<15, 4>(input)) {
       out[0] = 5;
-      NumberOfValuesCoded = 15;
+      numberOfValuesCoded = 15;
       for (uint32_t i = 0; i < 15; i++) WriteBits(out, *input++, 4);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 4 * 15;
     } else if (TryPackFast<12, 5>(input)) {
       out[0] = 6;
-      NumberOfValuesCoded = 12;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 5);
+      numberOfValuesCoded = 12;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 5);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 5 * 12;
     } else if (TryPackFast<10, 6>(input)) {
       out[0] = 7;
-      NumberOfValuesCoded = 10;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 6);
+      numberOfValuesCoded = 10;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 6);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 6 * 10;
     } else if (TryPackFast<8, 7>(input)) {
       out[0] = 8;
-      NumberOfValuesCoded = 8;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 7);
+      numberOfValuesCoded = 8;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 7);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 7 * 8;
     } else if (TryPackFast<7, 8>(input)) {
       out[0] = 9;
-      NumberOfValuesCoded = 7;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 8);
+      numberOfValuesCoded = 7;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 8);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 8 * 7;
     } else if (TryPackFast<6, 10>(input)) {
       out[0] = 10;
-      NumberOfValuesCoded = 6;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 10);
+      numberOfValuesCoded = 6;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 10);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 10 * 6;
     } else if (TryPackFast<5, 12>(input)) {
       out[0] = 11;
-      NumberOfValuesCoded = 5;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 12);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 12 * NumberOfValuesCoded;
+      numberOfValuesCoded = 5;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 12);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 12 * numberOfValuesCoded;
     } else if (TryPackFast<4, 15>(input)) {
       out[0] = 12;
-      NumberOfValuesCoded = 4;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 15);
+      numberOfValuesCoded = 4;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 15);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 15 * 4;
     } else if (TryPackFast<3, 20>(input)) {
       out[0] = 13;
-      NumberOfValuesCoded = 3;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 20);
+      numberOfValuesCoded = 3;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 20);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 20 * 3;
     } else if (TryPackFast<2, 30>(input)) {
       out[0] = 14;
-      NumberOfValuesCoded = 2;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 30);
+      numberOfValuesCoded = 2;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 30);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 30 * 2;
     } else if (TryPackFast<1, 60>(input)) {
       out[0] = 15;
-      NumberOfValuesCoded = 1;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 60);
+      numberOfValuesCoded = 1;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 60);
       out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 60 * 1;
     } else {
-      // throw std::logic_error("shouldn't happen");
+      std::abort();
     }
     ++out;
 
-    ValuesRemaining -= NumberOfValuesCoded;
+    valuesRemaining -= numberOfValuesCoded;
   }
-  while (ValuesRemaining > 0) {
-    if (TryPackCareful<240, 0>(input, ValuesRemaining)) {
-      NumberOfValuesCoded = (ValuesRemaining < 240) ? static_cast<uint32_t>(ValuesRemaining) : 240;
+  while (valuesRemaining > 0) {
+    if (TryPackCareful<240, 0>(input, valuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 240) ? static_cast<uint32_t>(valuesRemaining) : 240;
       out[0] = 0;
-      input += NumberOfValuesCoded;
-    } else if (TryPackCareful<120, 0>(input, ValuesRemaining)) {
-      NumberOfValuesCoded = (ValuesRemaining < 120) ? static_cast<uint32_t>(ValuesRemaining) : 120;
+      input += numberOfValuesCoded;
+    } else if (TryPackCareful<120, 0>(input, valuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 120) ? static_cast<uint32_t>(valuesRemaining) : 120;
       out[0] = 1ULL << (64 - SIMPLE8B_SELECTOR_BITS);
-      input += NumberOfValuesCoded;
-    } else if (TryPackCareful<60, 1>(input, ValuesRemaining)) {
+      input += numberOfValuesCoded;
+    } else if (TryPackCareful<60, 1>(input, valuesRemaining)) {
       out[0] = 2;
-      NumberOfValuesCoded = (ValuesRemaining < 60) ? static_cast<uint32_t>(ValuesRemaining) : 60;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) {
+      numberOfValuesCoded = (valuesRemaining < 60) ? static_cast<uint32_t>(valuesRemaining) : 60;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) {
         WriteBits(out, *input++, 1);
       }
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 1 * NumberOfValuesCoded;
-    } else if (TryPackCareful<30, 2>(input, ValuesRemaining)) {
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 1 * numberOfValuesCoded;
+    } else if (TryPackCareful<30, 2>(input, valuesRemaining)) {
       out[0] = 3;
-      NumberOfValuesCoded = (ValuesRemaining < 30) ? static_cast<uint32_t>(ValuesRemaining) : 30;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 2);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 2 * NumberOfValuesCoded;
-    } else if (TryPackCareful<20, 3>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 30) ? static_cast<uint32_t>(valuesRemaining) : 30;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 2);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 2 * numberOfValuesCoded;
+    } else if (TryPackCareful<20, 3>(input, valuesRemaining)) {
       out[0] = 4;
-      NumberOfValuesCoded = (ValuesRemaining < 20) ? static_cast<uint32_t>(ValuesRemaining) : 20;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 3);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 3 * NumberOfValuesCoded;
-    } else if (TryPackCareful<15, 4>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 20) ? static_cast<uint32_t>(valuesRemaining) : 20;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 3);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 3 * numberOfValuesCoded;
+    } else if (TryPackCareful<15, 4>(input, valuesRemaining)) {
       out[0] = 5;
-      NumberOfValuesCoded = (ValuesRemaining < 15) ? static_cast<uint32_t>(ValuesRemaining) : 15;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 4);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 4 * NumberOfValuesCoded;
-    } else if (TryPackCareful<12, 5>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 15) ? static_cast<uint32_t>(valuesRemaining) : 15;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 4);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 4 * numberOfValuesCoded;
+    } else if (TryPackCareful<12, 5>(input, valuesRemaining)) {
       out[0] = 6;
-      NumberOfValuesCoded = (ValuesRemaining < 12) ? static_cast<uint32_t>(ValuesRemaining) : 12;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 5);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 5 * NumberOfValuesCoded;
-    } else if (TryPackCareful<10, 6>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 12) ? static_cast<uint32_t>(valuesRemaining) : 12;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 5);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 5 * numberOfValuesCoded;
+    } else if (TryPackCareful<10, 6>(input, valuesRemaining)) {
       out[0] = 7;
-      NumberOfValuesCoded = (ValuesRemaining < 10) ? static_cast<uint32_t>(ValuesRemaining) : 10;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 6);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 6 * NumberOfValuesCoded;
-    } else if (TryPackCareful<8, 7>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 10) ? static_cast<uint32_t>(valuesRemaining) : 10;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 6);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 6 * numberOfValuesCoded;
+    } else if (TryPackCareful<8, 7>(input, valuesRemaining)) {
       out[0] = 8;
-      NumberOfValuesCoded = (ValuesRemaining < 8) ? static_cast<uint32_t>(ValuesRemaining) : 8;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 7);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 7 * NumberOfValuesCoded;
-    } else if (TryPackCareful<7, 8>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 8) ? static_cast<uint32_t>(valuesRemaining) : 8;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 7);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 7 * numberOfValuesCoded;
+    } else if (TryPackCareful<7, 8>(input, valuesRemaining)) {
       out[0] = 9;
-      NumberOfValuesCoded = (ValuesRemaining < 7) ? static_cast<uint32_t>(ValuesRemaining) : 7;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 8);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 8 * NumberOfValuesCoded;
-    } else if (TryPackCareful<6, 10>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 7) ? static_cast<uint32_t>(valuesRemaining) : 7;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 8);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 8 * numberOfValuesCoded;
+    } else if (TryPackCareful<6, 10>(input, valuesRemaining)) {
       out[0] = 10;
-      NumberOfValuesCoded = (ValuesRemaining < 6) ? static_cast<uint32_t>(ValuesRemaining) : 6;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 10);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 10 * NumberOfValuesCoded;
-    } else if (TryPackCareful<5, 12>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 6) ? static_cast<uint32_t>(valuesRemaining) : 6;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 10);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 10 * numberOfValuesCoded;
+    } else if (TryPackCareful<5, 12>(input, valuesRemaining)) {
       out[0] = 11;
-      NumberOfValuesCoded = (ValuesRemaining < 5) ? static_cast<uint32_t>(ValuesRemaining) : 5;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 12);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 12 * NumberOfValuesCoded;
-    } else if (TryPackCareful<4, 15>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 5) ? static_cast<uint32_t>(valuesRemaining) : 5;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 12);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 12 * numberOfValuesCoded;
+    } else if (TryPackCareful<4, 15>(input, valuesRemaining)) {
       out[0] = 12;
-      NumberOfValuesCoded = (ValuesRemaining < 4) ? static_cast<uint32_t>(ValuesRemaining) : 4;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 15);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 15 * NumberOfValuesCoded;
-    } else if (TryPackCareful<3, 20>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 4) ? static_cast<uint32_t>(valuesRemaining) : 4;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 15);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 15 * numberOfValuesCoded;
+    } else if (TryPackCareful<3, 20>(input, valuesRemaining)) {
       out[0] = 13;
-      NumberOfValuesCoded = (ValuesRemaining < 3) ? static_cast<uint32_t>(ValuesRemaining) : 3;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 20);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 20 * NumberOfValuesCoded;
-    } else if (TryPackCareful<2, 30>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 3) ? static_cast<uint32_t>(valuesRemaining) : 3;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 20);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 20 * numberOfValuesCoded;
+    } else if (TryPackCareful<2, 30>(input, valuesRemaining)) {
       out[0] = 14;
-      NumberOfValuesCoded = (ValuesRemaining < 2) ? static_cast<uint32_t>(ValuesRemaining) : 2;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 30);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 30 * NumberOfValuesCoded;
-    } else if (TryPackCareful<1, 60>(input, ValuesRemaining)) {
+      numberOfValuesCoded = (valuesRemaining < 2) ? static_cast<uint32_t>(valuesRemaining) : 2;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 30);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 30 * numberOfValuesCoded;
+    } else if (TryPackCareful<1, 60>(input, valuesRemaining)) {
       out[0] = 15;
-      NumberOfValuesCoded = (ValuesRemaining < 1) ? ValuesRemaining : 1;
-      for (uint32_t i = 0; i < NumberOfValuesCoded; i++) WriteBits(out, *input++, 60);
-      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 60 * NumberOfValuesCoded;
+      numberOfValuesCoded = (valuesRemaining < 1) ? valuesRemaining : 1;
+      for (uint32_t i = 0; i < numberOfValuesCoded; i++) WriteBits(out, *input++, 60);
+      out[0] <<= 64 - SIMPLE8B_SELECTOR_BITS - 60 * numberOfValuesCoded;
     } else {
-      // throw std::logic_error("shouldn't happen");
+      std::abort();
     }
 
     ++out;
 
-    ValuesRemaining -= NumberOfValuesCoded;
+    valuesRemaining -= numberOfValuesCoded;
   }
 
   return (out)-initout;
