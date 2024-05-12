@@ -1,25 +1,25 @@
-#include "sensor.h"
+#include "correction.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using namespace sensor_compress;
 
-TEST(FPointwiseCorrectionTest, noref) {
+TEST(PointwiseCorrectionTest, noref) {
   PointwiseCorrection pc({});
   EXPECT_FLOAT_EQ(0, pc.Correct(0));
   EXPECT_FLOAT_EQ(1, pc.Correct(1));
   EXPECT_FLOAT_EQ(-1, pc.Correct(-1));
 }
 
-TEST(FPointwiseCorrectionTest, oneref) {
+TEST(PointwiseCorrectionTest, oneref) {
   PointwiseCorrection pc({{0, 10}});
   EXPECT_FLOAT_EQ(-1, pc.Correct(-1));
   EXPECT_FLOAT_EQ(10, pc.Correct(0));
   EXPECT_FLOAT_EQ(1, pc.Correct(1));
 }
 
-TEST(FPointwiseCorrectionTest, tworef) {
+TEST(PointwiseCorrectionTest, tworef) {
   PointwiseCorrection pc({{0, 10}, {1, 20}});
   EXPECT_FLOAT_EQ(-1, pc.Correct(-1));
   EXPECT_FLOAT_EQ(-.1, pc.Correct(-.1));
@@ -30,13 +30,13 @@ TEST(FPointwiseCorrectionTest, tworef) {
   EXPECT_FLOAT_EQ(20, pc.Correct(1));
 }
 
-TEST(ILinearCorrectionTest, linear) {
+TEST(LinearCorrectionTest, linear) {
   LinearCorrection ic(0, 10, 10, 30);
   EXPECT_FLOAT_EQ(ic.Correct(0), 10);
   EXPECT_FLOAT_EQ(ic.Correct(5), 20);
   EXPECT_FLOAT_EQ(ic.Correct(10), 30);
 }
-TEST(ILinearCorrectionTest, outOfBounds) {
+TEST(LinearCorrectionTest, outOfBounds) {
   LinearCorrection ic(5, 10, 10, 30);
   EXPECT_FLOAT_EQ(ic.Correct(0), -10);
   EXPECT_FLOAT_EQ(ic.Correct(5), 10);

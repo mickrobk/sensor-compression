@@ -1,9 +1,4 @@
-#include <stdint.h>
 
-#include <algorithm>
-#include <cstddef>
-
-#include "simple8b.h"
 /*
     Adapted from https://github.com/lemire/FastPFor (Apache License Version 2.0)
 
@@ -14,6 +9,15 @@
     Notable changes:
         - C++ templates used to make methods generic over integer bit-width
         - support longer arrays via 64 bit length arguments
+
+    --------------------------------------------------------------------------------
+    --------------------------------------------------------------------------------
+
+    Adapted from https://github.com/naturalplasmoid/simple8b-timeseries-compression
+    (Apache License Version 2.0) by Robert Mickle
+
+    Notable changes:
+      - Integer safe operations for delta encode/decode
 */
 
 const uint8_t SIMPLE8B_SELECTOR_BITS =
@@ -275,7 +279,7 @@ size_t Simple8bEncode(T *input, size_t inputLength, uint64_t *out) {
 }
 
 template <typename T>
-const size_t Simple8bDecode(uint64_t *input, size_t uncompressedLength, T *out) {
+size_t Simple8bDecode(uint64_t *input, size_t uncompressedLength, T *out) {
   const uint64_t *in = input;
   const T *const end = out + uncompressedLength;
   const T *const initout = out;
@@ -391,20 +395,6 @@ const size_t Simple8bDecode(uint64_t *input, size_t uncompressedLength, T *out) 
 
   // ASSERT(out < end + 240, out - end);
   return out - initout;
-}
-
-template <typename T>
-void DeltaEncode(T *input, size_t length) {
-  for (size_t i = length - 1; i > 0; i--) {
-    input[i] = input[i] - input[i - 1];
-  }
-}
-
-template <typename T>
-void DeltaDecode(T *input, size_t length) {
-  for (size_t i = 1; i < length; i++) {
-    input[i] = input[i] + input[i - 1];
-  }
 }
 
 template <typename T>
