@@ -11,6 +11,7 @@
 #include "compress.h"
 #include "correction.h"
 #include "log_container.h"
+#include "time_util.h"
 
 namespace sensor_compress {
 
@@ -45,35 +46,37 @@ struct CompressedDataFrame {
   std::vector<uint8_t> times;
 };
 
-struct CompressionMemory {
-  std::vector<uint64_t> ua, ub;
-  std::vector<int32_t> sa;
-  size_t size;
-  explicit CompressionMemory(size_t size) { resize(size); }
-  void resize(size_t size) {
-    this->size = size;
-    ua.resize(size);
-    ub.resize(size);
-    sa.resize(size);
-  }
-};
-
 class DataFrame {
  public:
-  using steady_time_point_t = std::chrono::time_point<std::chrono::steady_clock>;
   void Record(steady_time_point_t, uint value);
   const std::vector<uint>& Values() const;
+
+  // TODO
+  // Breaks if you do > 1 simple8b in a row
+  // Time compression is not implemented
   std::optional<CompressedDataFrame> Compress(const DataFrameReference& reference) const;
   static std::optional<DataFrame> Decompress(const DataFrameReference& reference,
                                              const CompressedDataFrame& data);
 
  private:
+  struct CompressionMemory {
+    std::vector<uint64_t> ua, ub;
+    std::vector<int32_t> sa;
+    size_t size;
+    explicit CompressionMemory(size_t size) { resize(size); }
+    void resize(size_t size) {
+      this->size = size;
+      ua.resize(size);
+      ub.resize(size);
+      sa.resize(size);
+    }
+  };
   static bool Decompress(DataFrameReference::CompressionType compression_type,
                          CompressionMemory& mem,
                          std::optional<CompressionSideChannel>& side_channel);
   bool Compress(DataFrameReference::CompressionType compression_type, CompressionMemory& mem,
                 std::optional<CompressionSideChannel>& side_channel) const;
-  uint64_t AsMs(steady_time_point_t tp) const;
+
   std::vector<steady_time_point_t> times_;
   std::vector<uint> values_;
 };

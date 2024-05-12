@@ -98,6 +98,7 @@ bool DataFrame::Decompress(DataFrameReference::CompressionType compression_type,
       return true;
     }
   }
+  return false;
 }
 bool DataFrame::Compress(DataFrameReference::CompressionType compression_type,
                          CompressionMemory& mem,
@@ -125,10 +126,7 @@ bool DataFrame::Compress(DataFrameReference::CompressionType compression_type,
       return true;
     }
   }
-}
-uint64_t DataFrame::AsMs(steady_time_point_t tp) const {
-  auto mills = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
-  return static_cast<uint64_t>(mills.count());
+  return false;
 }
 
 }  // namespace sensor_compress
