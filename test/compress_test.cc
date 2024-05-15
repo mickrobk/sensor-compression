@@ -128,10 +128,10 @@ TEST(CompressTest, rleLongRun) {
 }
 
 TEST(CompressTest, rleTime) {
-  uint64_t a = AsMs(std::chrono::steady_clock::now());
-  uint64_t b = AsMs(std::chrono::steady_clock::now());
-  uint64_t c = AsMs(std::chrono::steady_clock::now());
-  uint64_t d = AsMs(std::chrono::steady_clock::now());
+  uint64_t a = ToMs(std::chrono::steady_clock::now());
+  uint64_t b = ToMs(std::chrono::steady_clock::now());
+  uint64_t c = ToMs(std::chrono::steady_clock::now());
+  uint64_t d = ToMs(std::chrono::steady_clock::now());
   std::vector<uint64_t> foo = {a, b, c, d};
   size_t orginal_len = foo.size();
   std::vector<uint64_t> compressed;

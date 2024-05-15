@@ -3,12 +3,13 @@
 
 namespace sensor_compress {
 
-void DataFrame::Record(steady_time_point_t, uint value) {
-  times_.push_back(std::chrono::steady_clock::now());
+void DataFrame::Record(steady_time_point_t t, uint value) {
+  times_.push_back(t);
   values_.push_back(value);
 }
 
 const std::vector<uint>& DataFrame::Values() const { return values_; }
+const std::vector<steady_time_point_t>& DataFrame::Times() const { return times_; }
 
 std::optional<CompressedDataFrame> DataFrame::Compress(const DataFrameReference& reference) const {
   CompressedDataFrame result;
@@ -30,8 +31,23 @@ std::optional<CompressedDataFrame> DataFrame::Compress(const DataFrameReference&
   }
   result.values.resize(mem.ua.size() * sizeof(uint64_t));
   std::memcpy(result.values.data(), mem.ua.data(), mem.size * sizeof(uint64_t));
-  result.value_compression_ratio =
-      (values_.size() * sizeof(decltype(values_)::value_type) * 1.0f) / result.values.size();
+  result.value_compression_ratio = (values_.size() * sizeof(uint) * 1.0f) / result.values.size();
+
+  mem.resize(times_.size());
+  for (int i = 0; i < times_.size(); i++) {
+    mem.ua[i] = ToMs(times_[i]);
+  }
+  for (auto& c : reference.time_compressions) {
+    std::optional<CompressionSideChannel> side_channel;
+    if (!Compress(c, mem, side_channel)) return std::nullopt;
+    if (side_channel) {
+      result.side_channel.push_back(*side_channel);
+    }
+  }
+  result.times.resize(mem.ua.size() * sizeof(uint64_t));
+  std::memcpy(result.times.data(), mem.ua.data(), mem.size * sizeof(uint64_t));
+  result.time_compression_ratio =
+      (times_.size() * sizeof(decltype(times_)::value_type) * 1.0f) / result.times.size();
 
   return result;
 }
@@ -39,10 +55,6 @@ std::optional<DataFrame> DataFrame::Decompress(const DataFrameReference& referen
                                                const CompressedDataFrame& data) {
   DataFrame result;
   CompressionMemory mem(data.values.size() / sizeof(uint64_t));
-  if (data.values.empty()) {
-    return result;
-  }
-  std::memcpy(mem.ua.data(), data.values.data(), data.values.size());
   auto side_channel_it = data.side_channel.rbegin();
   std::optional<CompressionSideChannel> side_channel;
   auto maybe_update_side_channel = [&]() {
@@ -50,6 +62,25 @@ std::optional<DataFrame> DataFrame::Decompress(const DataFrameReference& referen
     side_channel = *side_channel_it;
     side_channel_it++;
   };
+  if (data.times.empty()) return result;
+  mem.resize(data.times.size() / sizeof(uint64_t));
+  std::memcpy(mem.ua.data(), data.times.data(), data.times.size());
+  for (auto it = reference.time_compressions.rbegin(); it != reference.time_compressions.rend();
+       ++it) {
+    maybe_update_side_channel();
+    if (!Decompress(*it, mem, side_channel)) return std::nullopt;
+  }
+  for (auto& time : mem.ua) {
+    result.times_.push_back(FromMs(time));
+  }
+
+  ///////
+
+  if (data.values.empty()) {
+    return result;
+  }
+  mem.resize(data.values.size() / sizeof(uint64_t));
+  std::memcpy(mem.ua.data(), data.values.data(), data.values.size());
   for (auto it = reference.value_compressions.rbegin(); it != reference.value_compressions.rend();
        ++it) {
     maybe_update_side_channel();

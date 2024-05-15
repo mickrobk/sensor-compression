@@ -47,10 +47,9 @@ class DataFrame {
  public:
   void Record(steady_time_point_t, uint value);
   const std::vector<uint>& Values() const;
+  const std::vector<steady_time_point_t>& Times() const;
 
-  // TODO
   // Breaks if you do > 1 simple8b in a row
-  // Time compression is not implemented
   std::optional<CompressedDataFrame> Compress(const DataFrameReference& reference) const;
   static std::optional<DataFrame> Decompress(const DataFrameReference& reference,
                                              const CompressedDataFrame& data);
