@@ -131,3 +131,60 @@ TEST(DataFrameTest, compressExtendedDeltaSimple8b) {
   EXPECT_THAT(frame2_inc.Values(), ::testing::ElementsAreArray(values_inc));
   EXPECT_EQ(std::round(compressed_inc.value_compression_ratio), 50.f);
 }
+
+TEST(DataFrameTest, compressRle) {
+  DataFrame frame;
+  frame.Record(std::chrono::steady_clock::now(), 1);
+  frame.Record(std::chrono::steady_clock::now(), 2);
+  frame.Record(std::chrono::steady_clock::now(), 4);
+  frame.Record(std::chrono::steady_clock::now(), 8);
+
+  DataFrameReference reference(0, 4096, 12);
+  reference.value_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
+  auto compressed = *frame.Compress(reference);
+
+  auto frame2 = *DataFrame::Decompress(reference, compressed);
+  EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(1, 2, 4, 8));
+}
+
+TEST(DataFrameTest, compressRle2) {
+  DataFrame frame;
+  frame.Record(std::chrono::steady_clock::now(), 3);
+  frame.Record(std::chrono::steady_clock::now(), 3);
+  frame.Record(std::chrono::steady_clock::now(), 3);
+  frame.Record(std::chrono::steady_clock::now(), 3);
+
+  DataFrameReference reference(0, 4096, 12);
+  reference.value_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
+  auto compressed = *frame.Compress(reference);
+
+  auto frame2 = *DataFrame::Decompress(reference, compressed);
+  EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(3, 3, 3, 3));
+}
+
+TEST(DataFrameTest, compressExtendedDeltaRleSimple8b) {
+  std::vector<uint> values, values_inc;
+  for (int i = 0; i < 200; i++) {
+    values.push_back(1);
+    values_inc.push_back(i);
+  }
+  DataFrame frame, frame_inc;
+  for (int i = 0; i < values.size(); i++) {
+    frame.Record(std::chrono::steady_clock::now(), values[i]);
+    frame_inc.Record(std::chrono::steady_clock::now(), values_inc[i]);
+  }
+
+  DataFrameReference reference(0, 4096, 12);
+  reference.value_compressions.push_back(DataFrameReference::CompressionType::kDeltaZigZag);
+  reference.value_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
+  reference.value_compressions.push_back(DataFrameReference::CompressionType::kSimple8b);
+  auto compressed = *frame.Compress(reference);
+  auto compressed_inc = *frame_inc.Compress(reference);
+
+  auto frame2 = *DataFrame::Decompress(reference, compressed);
+  auto frame2_inc = *DataFrame::Decompress(reference, compressed_inc);
+  EXPECT_THAT(frame2.Values(), ::testing::ElementsAreArray(values));
+  EXPECT_EQ(std::round(compressed.value_compression_ratio), 100.f);
+  EXPECT_THAT(frame2_inc.Values(), ::testing::ElementsAreArray(values_inc));
+  EXPECT_EQ(std::round(compressed_inc.value_compression_ratio), 100.f);
+}

@@ -97,6 +97,23 @@ bool DataFrame::Decompress(DataFrameReference::CompressionType compression_type,
       if (!DeltaDecode(mem.sa.data(), mem.size, initial_value, mem.ua.data())) return false;
       return true;
     }
+    case DataFrameReference::CompressionType::kRLE2:
+    case DataFrameReference::CompressionType::kRLE4: {
+      if (!side_channel) {
+        printf("RLE missing side channel\n");
+        return false;
+      }
+      auto uncompressed_size = side_channel->rle_uncompressed_size;
+      auto compressed_size = mem.ua.size();
+      side_channel = std::nullopt;
+      mem.resize(uncompressed_size);
+      if (!RleDecode(mem.ua.data(), compressed_size, mem.ub.data(), uncompressed_size)) {
+        printf("RLEz decode failed\n");
+        return false;
+      }
+      std::memcpy(mem.ua.data(), mem.ub.data(), mem.ub.size() * sizeof(uint64_t));
+      return true;
+    }
   }
   return false;
 }
@@ -123,6 +140,20 @@ bool DataFrame::Compress(DataFrameReference::CompressionType compression_type,
       for (int i = 0; i < mem.size; i++) {
         mem.ua[i] = static_cast<uint64_t>(mem.sa[i]);
       }
+      return true;
+    }
+    case DataFrameReference::CompressionType::kRLE2:
+    case DataFrameReference::CompressionType::kRLE4: {
+      size_t min_run = compression_type == DataFrameReference::CompressionType::kRLE2 ? 2 : 4;
+      side_channel = CompressionSideChannel();
+      side_channel->rle_uncompressed_size = mem.ua.size();
+      auto out_len = RleEncode(min_run, mem.ua.data(), mem.size, mem.ub.data());
+      if (!out_len) {
+        printf("RLE encode failed\n");
+        return false;
+      }
+      mem.resize(*out_len);
+      std::memcpy(mem.ua.data(), mem.ub.data(), *out_len * sizeof(uint64_t));
       return true;
     }
   }

@@ -17,11 +17,7 @@ namespace sensor_compress {
 
 struct DataFrameReference {
   // Must always go from uint64_t --> uint64_t
-  enum class CompressionType {
-    kSimple8b,
-    kZigZag,
-    kDeltaZigZag,
-  };
+  enum class CompressionType { kSimple8b, kZigZag, kDeltaZigZag, kRLE2, kRLE4 };
   DataFrameReference(uint min, uint max, uint resolution_bits)
       : min(min), max(max), resolution_bits(resolution_bits) {}
   uint min, max;
@@ -36,6 +32,7 @@ union CompressionSideChannel {
   uint64_t initial_value;
   uint64_t initial_time;
   size_t simple8b_uncompressed_size;
+  size_t rle_uncompressed_size;
 };
 
 struct CompressedDataFrame {

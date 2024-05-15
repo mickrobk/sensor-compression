@@ -25,10 +25,10 @@ void ZigZagEncode(T *input, size_t length);
 template <typename T>
 void ZigZagDecode(T *input, size_t length);
 
-std::optional<size_t> RLEEncode(size_t min_run_length, uint64_t *input, size_t count,
+std::optional<size_t> RleEncode(size_t min_run_length, uint64_t *input, size_t count,
                                 uint64_t *out);
 
-std::optional<size_t> RLEDecode(uint64_t *input, size_t count, uint64_t *out);
+bool RleDecode(uint64_t *input, size_t count, uint64_t *out, size_t out_size);
 
 #include "compress.inl"
 
