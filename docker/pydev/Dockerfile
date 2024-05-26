@@ -11,6 +11,9 @@ ENV PYTHONUNBUFFERED=1
 COPY docker/pydev/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
+# disable announcement popup...
+RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+
 WORKDIR /app
 COPY . /app
 
@@ -21,4 +24,4 @@ USER appuser
 
 EXPOSE 8888
 
-ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root"]
+ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y", "--ServerApp.root_dir='/home/appuser/py'"]
