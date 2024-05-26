@@ -15,17 +15,24 @@
 
 namespace sensor_compress {
 
-struct DataFrameReference {
-  // Must always go from uint64_t --> uint64_t
+struct DataHeader {
   enum class CompressionType { kSimple8b, kZigZag, kDeltaZigZag, kRLE2, kRLE4 };
-  DataFrameReference(uint min, uint max, uint resolution_bits)
-      : min(min), max(max), resolution_bits(resolution_bits) {}
+  DataHeader(uint min, uint max, uint resolution_bits)
+      : min(min), max(max), resolution_bits(resolution_bits) {
+    start_time_utc = std::chrono::system_clock::now();
+    start_time_steady = std::chrono::steady_clock::now();
+  }
+  std::string source_identifier;
+  std::string source_uuid;
+  std::string data_type;
+  uint32_t version = 1;
   uint min, max;
   uint8_t resolution_bits;
+  size_t frame_size = 10000;
   std::vector<CompressionType> value_compressions;
   std::vector<CompressionType> time_compressions;
-  std::chrono::time_point<std::chrono::system_clock> start_time_utc;
-  std::chrono::time_point<std::chrono::steady_clock> start_time_monotonic;
+  utc_time_point_t start_time_utc;
+  steady_time_point_t start_time_steady;
 };
 
 union CompressionSideChannel {
@@ -43,15 +50,26 @@ struct CompressedDataFrame {
   std::vector<uint8_t> times;
 };
 
+struct DataFrameValue {
+  steady_time_point_t t;
+  uint value;
+};
+
 class DataFrame {
  public:
+  void Record(DataFrameValue value) { Record(value.t, value.value); }
   void Record(steady_time_point_t, uint value);
+  void Clear() {
+    times_.clear();
+    values_.clear();
+  }
   const std::vector<uint>& Values() const;
   const std::vector<steady_time_point_t>& Times() const;
+  size_t size() const { return times_.size(); }
 
   // Breaks if you do > 1 simple8b in a row
-  std::optional<CompressedDataFrame> Compress(const DataFrameReference& reference) const;
-  static std::optional<DataFrame> Decompress(const DataFrameReference& reference,
+  std::optional<CompressedDataFrame> Compress(const DataHeader& reference) const;
+  static std::optional<DataFrame> Decompress(const DataHeader& reference,
                                              const CompressedDataFrame& data);
 
  private:
@@ -67,14 +85,35 @@ class DataFrame {
       sa.resize(size);
     }
   };
-  static bool Decompress(DataFrameReference::CompressionType compression_type,
-                         CompressionMemory& mem,
+  static bool Decompress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
                          std::optional<CompressionSideChannel>& side_channel);
-  bool Compress(DataFrameReference::CompressionType compression_type, CompressionMemory& mem,
+  bool Compress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
                 std::optional<CompressionSideChannel>& side_channel) const;
 
   std::vector<steady_time_point_t> times_;
   std::vector<uint> values_;
+};
+
+class DataStream {
+ public:
+  bool Record(const DataHeader& header, DataFrameValue value) {
+    if (current_frame_.size() >= header.frame_size) {
+      if (auto compressed = current_frame_.Compress(header)) {
+        past_frames_.push_back(*std::move(compressed));
+        current_frame_.Clear();
+        return true;
+      } else {
+        printf("Failed to compress current frame\n");
+        return false;
+      }
+    }
+  }
+
+ private:
+  DataFrame current_frame_;
+  std::vector<CompressedDataFrame> past_frames_;
+  std::optional<DataFrame> working_frame_;
+  std::optional<size_t> working_offset_into_past_ = 0;
 };
 
 }  // namespace sensor_compress

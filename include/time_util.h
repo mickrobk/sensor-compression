@@ -3,6 +3,7 @@
 
 namespace sensor_compress {
 using steady_time_point_t = std::chrono::time_point<std::chrono::steady_clock>;
+using utc_time_point_t = std::chrono::time_point<std::chrono::system_clock>;
 
 inline uint64_t ToMs(steady_time_point_t tp) {
   auto mills = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());

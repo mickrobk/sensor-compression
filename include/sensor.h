@@ -4,16 +4,18 @@
 #include <string>
 
 #include "correction.h"
+#include "data_frame.h"
 
 namespace sensor_compress {
 
 class Sensor {
  public:
- private:
-  uint64_t uuid_;
-  std::string name_;
-  std::string unit_;
-  CombinedCorrection correction_;
+  virtual ~Sensor() = default;
+  virtual void Update() = 0;
+
+  CombinedCorrection correction;
+  DataHeader header;
+  DataStream stream;
 };
 
 }  // namespace sensor_compress

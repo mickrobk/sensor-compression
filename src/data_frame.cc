@@ -11,7 +11,7 @@ void DataFrame::Record(steady_time_point_t t, uint value) {
 const std::vector<uint>& DataFrame::Values() const { return values_; }
 const std::vector<steady_time_point_t>& DataFrame::Times() const { return times_; }
 
-std::optional<CompressedDataFrame> DataFrame::Compress(const DataFrameReference& reference) const {
+std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& reference) const {
   CompressedDataFrame result;
   if (values_.empty()) {
     return result;
@@ -51,7 +51,7 @@ std::optional<CompressedDataFrame> DataFrame::Compress(const DataFrameReference&
 
   return result;
 }
-std::optional<DataFrame> DataFrame::Decompress(const DataFrameReference& reference,
+std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
                                                const CompressedDataFrame& data) {
   DataFrame result;
   CompressionMemory mem(data.values.size() / sizeof(uint64_t));
@@ -94,11 +94,10 @@ std::optional<DataFrame> DataFrame::Decompress(const DataFrameReference& referen
   return result;
 }
 
-bool DataFrame::Decompress(DataFrameReference::CompressionType compression_type,
-                           CompressionMemory& mem,
+bool DataFrame::Decompress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
                            std::optional<CompressionSideChannel>& side_channel) {
   switch (compression_type) {
-    case DataFrameReference::CompressionType::kSimple8b: {
+    case DataHeader::CompressionType::kSimple8b: {
       if (!side_channel) {
         printf("kSimple8b missing side channel\n");
         return false;
@@ -111,10 +110,10 @@ bool DataFrame::Decompress(DataFrameReference::CompressionType compression_type,
       mem.resize(out_len);
       return true;
     }
-    case DataFrameReference::CompressionType::kZigZag:
+    case DataHeader::CompressionType::kZigZag:
       ZigZagDecode(mem.ua.data(), mem.size);
       return true;
-    case DataFrameReference::CompressionType::kDeltaZigZag: {
+    case DataHeader::CompressionType::kDeltaZigZag: {
       if (!side_channel) {
         printf("DeltaZigZag missing side channel\n");
         return false;
@@ -128,8 +127,8 @@ bool DataFrame::Decompress(DataFrameReference::CompressionType compression_type,
       if (!DeltaDecode(mem.sa.data(), mem.size, initial_value, mem.ua.data())) return false;
       return true;
     }
-    case DataFrameReference::CompressionType::kRLE2:
-    case DataFrameReference::CompressionType::kRLE4: {
+    case DataHeader::CompressionType::kRLE2:
+    case DataHeader::CompressionType::kRLE4: {
       if (!side_channel) {
         printf("RLE missing side channel\n");
         return false;
@@ -148,11 +147,10 @@ bool DataFrame::Decompress(DataFrameReference::CompressionType compression_type,
   }
   return false;
 }
-bool DataFrame::Compress(DataFrameReference::CompressionType compression_type,
-                         CompressionMemory& mem,
+bool DataFrame::Compress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
                          std::optional<CompressionSideChannel>& side_channel) const {
   switch (compression_type) {
-    case DataFrameReference::CompressionType::kSimple8b: {
+    case DataHeader::CompressionType::kSimple8b: {
       side_channel = CompressionSideChannel();
       side_channel->simple8b_uncompressed_size = mem.ua.size();
       size_t out_len = Simple8bEncode(mem.ua.data(), mem.size, mem.ub.data());
@@ -160,10 +158,10 @@ bool DataFrame::Compress(DataFrameReference::CompressionType compression_type,
       mem.resize(out_len);
       return true;
     }
-    case DataFrameReference::CompressionType::kZigZag:
+    case DataHeader::CompressionType::kZigZag:
       ZigZagEncode(mem.ua.data(), mem.size);
       return true;
-    case DataFrameReference::CompressionType::kDeltaZigZag: {
+    case DataHeader::CompressionType::kDeltaZigZag: {
       side_channel = CompressionSideChannel();
       if (!DeltaEncode(mem.ua.data(), mem.ua.size(), &side_channel->initial_value, mem.sa.data()))
         return false;
@@ -173,9 +171,9 @@ bool DataFrame::Compress(DataFrameReference::CompressionType compression_type,
       }
       return true;
     }
-    case DataFrameReference::CompressionType::kRLE2:
-    case DataFrameReference::CompressionType::kRLE4: {
-      size_t min_run = compression_type == DataFrameReference::CompressionType::kRLE2 ? 2 : 4;
+    case DataHeader::CompressionType::kRLE2:
+    case DataHeader::CompressionType::kRLE4: {
+      size_t min_run = compression_type == DataHeader::CompressionType::kRLE2 ? 2 : 4;
       side_channel = CompressionSideChannel();
       side_channel->rle_uncompressed_size = mem.ua.size();
       auto out_len = RleEncode(min_run, mem.ua.data(), mem.size, mem.ub.data());
