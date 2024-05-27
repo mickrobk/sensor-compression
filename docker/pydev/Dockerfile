@@ -1,10 +1,9 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3
 
-# Keeps Python from generating .pyc files in the container
-ENV PYTHONDONTWRITEBYTECODE=1
+RUN apt-get update && apt-get -y install cmake python3-dev 
 
-# Turns off buffering for easier container logging
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # install nvm + node
@@ -21,11 +20,12 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 COPY docker/pydev/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
-# disable announcement popup
-RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
-
 WORKDIR /app
 COPY . /app
+
+# build python bindings
+RUN cmake . -B bin
+RUN cmake --build bin
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
@@ -34,4 +34,5 @@ USER appuser
 
 EXPOSE 8888
 
-ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y", "--ServerApp.root_dir='/home/appuser/py'"]
+# RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+# ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y", "--ServerApp.root_dir='/home/appuser/py'"]

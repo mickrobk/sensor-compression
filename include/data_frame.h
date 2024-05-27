@@ -15,6 +15,15 @@
 
 namespace sensor_compress {
 
+static inline unsigned int CountBits(uint v) {
+  unsigned int count = 0;
+  while (v > 0) {
+    count++;
+    v >>= 1;
+  }
+  return count;
+}
+
 struct DataHeader {
   enum class CompressionType { kSimple8b, kZigZag, kDeltaZigZag, kRLE2, kRLE4 };
   DataHeader(uint min, uint max, uint resolution_bits)
@@ -22,6 +31,7 @@ struct DataHeader {
     start_time_utc = std::chrono::system_clock::now();
     start_time_steady = std::chrono::steady_clock::now();
   }
+  DataHeader(uint min, uint max) : DataHeader(min, max, CountBits(max - min)) {}
   std::string source_identifier;
   std::string source_uuid;
   std::string data_type;
@@ -107,6 +117,10 @@ class DataStream {
         return false;
       }
     }
+    return false;
+  }
+  bool Record(const DataHeader& header, uint value) {
+    return Record(header, {std::chrono::steady_clock::now(), value});
   }
 
  private:
