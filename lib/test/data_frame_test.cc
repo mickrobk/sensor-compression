@@ -19,7 +19,7 @@ TEST(DataFrameTest, compressEmpty) {
   for (auto& t : frame.Times()) ms.push_back(ToMs(t));
   EXPECT_THAT(frame.Values(), ::testing::ElementsAre(1, 2, 2, 5, 10));
 
-  DataFrameReference reference(0, 4096, 12);
+  DataHeader reference(0, 4095);
   auto compressed = *frame.Compress(reference);
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(1, 2, 2, 5, 10));
@@ -35,8 +35,8 @@ TEST(DataFrameTest, compressZigZag) {
   frame.Record(std::chrono::steady_clock::now(), 2);
   frame.Record(std::chrono::steady_clock::now(), 4);
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kZigZag);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kZigZag);
   auto compressed = *frame.Compress(reference);
 
   std::array<uint64_t, 3> compressed64 = {2, 4, 8};
@@ -56,8 +56,8 @@ TEST(DataFrameTest, compressSimple8b) {
   frame.Record(std::chrono::steady_clock::now(), 4);
   frame.Record(std::chrono::steady_clock::now(), 8);
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kSimple8b);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
   auto compressed = *frame.Compress(reference);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
@@ -77,8 +77,8 @@ TEST(DataFrameTest, compressExtendedSimple8b) {
     frame_inc.Record(std::chrono::steady_clock::now(), values_inc[i]);
   }
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kSimple8b);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
   auto compressed = *frame.Compress(reference);
   auto compressed_inc = *frame_inc.Compress(reference);
 
@@ -96,8 +96,8 @@ TEST(DataFrameTest, compressDelta) {
   frame.Record(std::chrono::steady_clock::now(), 2);
   frame.Record(std::chrono::steady_clock::now(), 3);
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kDeltaZigZag);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
   auto compressed = *frame.Compress(reference);
 
   std::array<uint64_t, 3> compressed64 = {0, 2, 2};
@@ -122,10 +122,10 @@ TEST(DataFrameTest, compressExtendedDeltaSimple8b) {
     frame_inc.Record(std::chrono::steady_clock::now(), values_inc[i]);
   }
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kDeltaZigZag);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kDeltaZigZag);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kSimple8b);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
   auto compressed = *frame.Compress(reference);
   auto compressed_inc = *frame_inc.Compress(reference);
 
@@ -144,8 +144,8 @@ TEST(DataFrameTest, compressRle) {
   frame.Record(std::chrono::steady_clock::now(), 4);
   frame.Record(std::chrono::steady_clock::now(), 8);
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kRLE2);
   auto compressed = *frame.Compress(reference);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
@@ -159,8 +159,8 @@ TEST(DataFrameTest, compressRle2) {
   frame.Record(std::chrono::steady_clock::now(), 3);
   frame.Record(std::chrono::steady_clock::now(), 3);
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
+  DataHeader reference(0, 4095);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kRLE2);
   auto compressed = *frame.Compress(reference);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
@@ -181,13 +181,13 @@ TEST(DataFrameTest, compressExtendedDeltaRleSimple8b) {
     frame_inc.Record(times[i], values_inc[i]);
   }
 
-  DataFrameReference reference(0, 4096, 12);
-  reference.time_compressions.push_back(DataFrameReference::CompressionType::kDeltaZigZag);
-  reference.time_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
-  reference.time_compressions.push_back(DataFrameReference::CompressionType::kSimple8b);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kDeltaZigZag);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kRLE2);
-  reference.value_compressions.push_back(DataFrameReference::CompressionType::kSimple8b);
+  DataHeader reference(0, 4095);
+  reference.time_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
+  reference.time_compressions.push_back(DataHeader::CompressionType::kRLE2);
+  reference.time_compressions.push_back(DataHeader::CompressionType::kSimple8b);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kRLE2);
+  reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
   auto compressed = *frame.Compress(reference);
   auto compressed_inc = *frame_inc.Compress(reference);
 
