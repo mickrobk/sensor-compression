@@ -9,3 +9,31 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.cc)
 
 add_library(lib_sensor_compress ${SOURCES})
+
+# Unit tests
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  # Update from: https://github.com/google/googletest/releases
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+include_directories(${googletest_SOURCE_DIR}/googletest/include)
+include_directories(${googletest_SOURCE_DIR}/googlemock/include)
+
+enable_testing()
+add_executable(
+  sensor_test
+  test/compress_test.cc
+)
+target_link_libraries(
+  sensor_test
+  GTest::gtest_main
+  lib_sensor_compress
+)
+target_compile_options(sensor_test PRIVATE -fsanitize=address)
+target_link_options(sensor_test PRIVATE -fsanitize=address)
+include(GoogleTest)
+gtest_discover_tests(sensor_test)
