@@ -1,6 +1,9 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3
 
+# make bash default for exec
+RUN ln -sf /bin/bash /bin/sh
+
 RUN apt-get update && apt-get -y install cmake python3-dev 
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -19,6 +22,7 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 # Install pip requirements
 COPY docker/pydev/requirements.txt .
 RUN python -m pip install -r requirements.txt
+RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
 
 WORKDIR /app
 COPY . /app
@@ -26,13 +30,15 @@ COPY . /app
 # build python bindings
 RUN cmake . -B bin
 RUN cmake --build bin
+ENV PYTHONPATH "${PYTHONPATH}:/app/bin/bind/"
 
-# Creates a non-root user with an explicit UID and adds permission to access the /app folder
-# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
+# run as non-root
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
-
 EXPOSE 8888
 
-RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
-ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y", "--ServerApp.root_dir='/home/appuser/py'"]
+# start the jupyter server
+# output will contain the uri + auth token!
+ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y",  \
+  "--ServerApp.root_dir='/home/appuser/py'", \
+  "--FileContentsManager.preferred_dir='ipynb'"]
