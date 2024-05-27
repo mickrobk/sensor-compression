@@ -33,7 +33,7 @@ target_link_libraries(
   GTest::gtest_main
   lib_sensor_compress
 )
-target_compile_options(sensor_test PRIVATE -fsanitize=address)
-target_link_options(sensor_test PRIVATE -fsanitize=address)
+target_compile_options(sensor_test PRIVATE -fsanitize=address,undefined)
+target_link_options(sensor_test PRIVATE -fsanitize=address,undefined)
 include(GoogleTest)
 gtest_discover_tests(sensor_test)
