@@ -24,9 +24,11 @@ include_directories(${googletest_SOURCE_DIR}/googletest/include)
 include_directories(${googletest_SOURCE_DIR}/googlemock/include)
 
 enable_testing()
+
+file(GLOB TEST_SOURCES CONFIGURE_DEPENDS test/*.cpp test/*.cc)
 add_executable(
   sensor_test
-  test/compress_test.cc
+  ${TEST_SOURCES}
 )
 target_link_libraries(
   sensor_test
