@@ -34,5 +34,5 @@ USER appuser
 
 EXPOSE 8888
 
-# RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
-# ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y", "--ServerApp.root_dir='/home/appuser/py'"]
+RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root", "--no-browser", "-y", "--ServerApp.root_dir='/home/appuser/py'"]
