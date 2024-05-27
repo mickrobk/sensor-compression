@@ -6,6 +6,10 @@ Includes c++ implementation of Simple8b, delta, and zig-zag encoding/decoding.
 
 Forked from https://github.com/naturalplasmoid/simple8b-timeseries-compression, adapted from https://github.com/lemire/FastPFor, (Apache License Version 2.0)
 
+# Python support
+
+docker run --rm -it  $(docker build -q -f docker/py/Dockerfile .) python3
+
 # Analysis
 
 ```
