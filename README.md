@@ -13,3 +13,9 @@ cd <sensor_compress...>
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1  docker-compose up --build analyze
 ```
 Access via the link output in the terminal
+
+To get a shell in the analysis server:
+```
+# Must have the container up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1  docker-compose exec analyze sh
+```

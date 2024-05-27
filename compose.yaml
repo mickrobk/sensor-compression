@@ -7,3 +7,4 @@ services:
       - 8888:8888
     volumes:
       - ./py:/home/appuser/py
+    container_name: analysis
