@@ -20,13 +20,14 @@ TEST(DataFrameTest, compressEmpty) {
   EXPECT_THAT(frame.Values(), ::testing::ElementsAre(1, 2, 2, 5, 10));
 
   DataHeader reference(0, 4095);
-  auto compressed = *frame.Compress(reference);
+  float value_compression_ratio;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio);
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(1, 2, 2, 5, 10));
   std::vector<uint64_t> ms2;
   for (auto& t : frame2.Times()) ms2.push_back(ToMs(t));
   EXPECT_THAT(ms2, ::testing::ElementsAreArray(ms));
-  EXPECT_FLOAT_EQ(compressed.value_compression_ratio, 0.5f);
+  EXPECT_FLOAT_EQ(value_compression_ratio, 0.5f);
 }
 
 TEST(DataFrameTest, compressZigZag) {
@@ -37,7 +38,8 @@ TEST(DataFrameTest, compressZigZag) {
 
   DataHeader reference(0, 4095);
   reference.value_compressions.push_back(DataHeader::CompressionType::kZigZag);
-  auto compressed = *frame.Compress(reference);
+  float value_compression_ratio;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio);
 
   std::array<uint64_t, 3> compressed64 = {2, 4, 8};
   std::array<uint8_t, 3 * sizeof(uint64_t)> compressed8;
@@ -46,7 +48,7 @@ TEST(DataFrameTest, compressZigZag) {
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(1, 2, 4));
-  EXPECT_FLOAT_EQ(compressed.value_compression_ratio, 0.5f);
+  EXPECT_FLOAT_EQ(value_compression_ratio, 0.5f);
 }
 
 TEST(DataFrameTest, compressSimple8b) {
@@ -58,11 +60,13 @@ TEST(DataFrameTest, compressSimple8b) {
 
   DataHeader reference(0, 4095);
   reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
-  auto compressed = *frame.Compress(reference);
+
+  float value_compression_ratio;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(1, 2, 4, 8));
-  EXPECT_FLOAT_EQ(compressed.value_compression_ratio, 2.f);
+  EXPECT_FLOAT_EQ(value_compression_ratio, 2.f);
 }
 
 TEST(DataFrameTest, compressExtendedSimple8b) {
@@ -79,15 +83,16 @@ TEST(DataFrameTest, compressExtendedSimple8b) {
 
   DataHeader reference(0, 4095);
   reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
-  auto compressed = *frame.Compress(reference);
-  auto compressed_inc = *frame_inc.Compress(reference);
+  float value_compression_ratio, value_compression_ratio_inc;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio);
+  auto compressed_inc = *frame_inc.Compress(reference, &value_compression_ratio_inc);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   auto frame2_inc = *DataFrame::Decompress(reference, compressed_inc);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAreArray(values));
-  EXPECT_FLOAT_EQ(compressed.value_compression_ratio, 25.f);
+  EXPECT_FLOAT_EQ(value_compression_ratio, 25.f);
   EXPECT_THAT(frame2_inc.Values(), ::testing::ElementsAreArray(values_inc));
-  EXPECT_FLOAT_EQ(compressed_inc.value_compression_ratio, 4.f);
+  EXPECT_FLOAT_EQ(value_compression_ratio_inc, 4.f);
 }
 
 TEST(DataFrameTest, compressDelta) {
@@ -98,7 +103,8 @@ TEST(DataFrameTest, compressDelta) {
 
   DataHeader reference(0, 4095);
   reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
-  auto compressed = *frame.Compress(reference);
+  float value_compression_ratio;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio);
 
   std::array<uint64_t, 3> compressed64 = {0, 2, 2};
   std::array<uint8_t, 3 * sizeof(uint64_t)> compressed8;
@@ -107,7 +113,7 @@ TEST(DataFrameTest, compressDelta) {
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAre(1, 2, 3));
-  EXPECT_FLOAT_EQ(compressed.value_compression_ratio, .5f);
+  EXPECT_FLOAT_EQ(value_compression_ratio, .5f);
 }
 
 TEST(DataFrameTest, compressExtendedDeltaSimple8b) {
@@ -126,15 +132,16 @@ TEST(DataFrameTest, compressExtendedDeltaSimple8b) {
   reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
   reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
   reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
-  auto compressed = *frame.Compress(reference);
-  auto compressed_inc = *frame_inc.Compress(reference);
+  float value_compression_ratio, value_compression_ratio_inc;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio);
+  auto compressed_inc = *frame_inc.Compress(reference, &value_compression_ratio_inc);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   auto frame2_inc = *DataFrame::Decompress(reference, compressed_inc);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAreArray(values));
-  EXPECT_EQ(std::round(compressed.value_compression_ratio), 100.f);
+  EXPECT_EQ(std::round(value_compression_ratio), 100.f);
   EXPECT_THAT(frame2_inc.Values(), ::testing::ElementsAreArray(values_inc));
-  EXPECT_EQ(std::round(compressed_inc.value_compression_ratio), 50.f);
+  EXPECT_EQ(std::round(value_compression_ratio_inc), 50.f);
 }
 
 TEST(DataFrameTest, compressRle) {
@@ -188,17 +195,20 @@ TEST(DataFrameTest, compressExtendedDeltaRleSimple8b) {
   reference.value_compressions.push_back(DataHeader::CompressionType::kDeltaZigZag);
   reference.value_compressions.push_back(DataHeader::CompressionType::kRLE2);
   reference.value_compressions.push_back(DataHeader::CompressionType::kSimple8b);
-  auto compressed = *frame.Compress(reference);
-  auto compressed_inc = *frame_inc.Compress(reference);
+  float value_compression_ratio, time_compression_ratio;
+  auto compressed = *frame.Compress(reference, &value_compression_ratio, &time_compression_ratio);
+  float value_compression_ratio_inc, time_compression_ratio_inc;
+  auto compressed_inc =
+      *frame_inc.Compress(reference, &value_compression_ratio_inc, &time_compression_ratio_inc);
 
   auto frame2 = *DataFrame::Decompress(reference, compressed);
   auto frame2_inc = *DataFrame::Decompress(reference, compressed_inc);
   EXPECT_THAT(frame2.Values(), ::testing::ElementsAreArray(values));
   EXPECT_THAT(frame2.Times(), ::testing::ElementsAreArray(times));
-  EXPECT_EQ(std::round(compressed.value_compression_ratio), 100.f);
-  EXPECT_EQ(std::round(compressed.time_compression_ratio), 200.f);
+  EXPECT_EQ(std::round(value_compression_ratio), 100.f);
+  EXPECT_EQ(std::round(time_compression_ratio), 200.f);
   EXPECT_THAT(frame2_inc.Values(), ::testing::ElementsAreArray(values_inc));
   EXPECT_THAT(frame2_inc.Times(), ::testing::ElementsAreArray(times));
-  EXPECT_EQ(std::round(compressed_inc.value_compression_ratio), 100.f);
-  EXPECT_EQ(std::round(compressed_inc.time_compression_ratio), 200.f);
+  EXPECT_EQ(std::round(value_compression_ratio_inc), 100.f);
+  EXPECT_EQ(std::round(time_compression_ratio_inc), 200.f);
 }

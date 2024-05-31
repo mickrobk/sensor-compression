@@ -11,7 +11,9 @@ void DataFrame::Record(steady_time_point_t t, uint value) {
 const std::vector<uint>& DataFrame::Values() const { return values_; }
 const std::vector<steady_time_point_t>& DataFrame::Times() const { return times_; }
 
-std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& reference) const {
+std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& reference,
+                                                       float* value_compression_ratio,
+                                                       float* time_compression_ratio) const {
   CompressedDataFrame result;
   if (values_.empty()) {
     return result;
@@ -31,7 +33,8 @@ std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& referen
   }
   result.values.resize(mem.ua.size() * sizeof(uint64_t));
   std::memcpy(result.values.data(), mem.ua.data(), mem.size * sizeof(uint64_t));
-  result.value_compression_ratio = (values_.size() * sizeof(uint) * 1.0f) / result.values.size();
+  if (value_compression_ratio)
+    *value_compression_ratio = (values_.size() * sizeof(uint) * 1.0f) / result.values.size();
 
   mem.resize(times_.size());
   for (int i = 0; i < times_.size(); i++) {
@@ -46,8 +49,9 @@ std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& referen
   }
   result.times.resize(mem.ua.size() * sizeof(uint64_t));
   std::memcpy(result.times.data(), mem.ua.data(), mem.size * sizeof(uint64_t));
-  result.time_compression_ratio =
-      (times_.size() * sizeof(decltype(times_)::value_type) * 1.0f) / result.times.size();
+  if (time_compression_ratio)
+    *time_compression_ratio =
+        (times_.size() * sizeof(decltype(times_)::value_type) * 1.0f) / result.times.size();
 
   return result;
 }
