@@ -30,3 +30,13 @@ To get a shell in the analysis server:
 # Must have the container up
 docker compose --profile dev exec analyze sh
 ```
+
+# Building
+cmake . -B build -G Ninja  && ninja -C build
+
+### Running tests
+./build/sensor_compress/lib/sensor_test
+
+#### Example test runs
+// Rebuild and run only sensor-compress json tests
+ninja -C build && ./build/sensor_compress/lib/sensor_test --gtest_filter="JsonTest*"

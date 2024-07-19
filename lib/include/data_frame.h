@@ -45,12 +45,14 @@ struct DataHeader {
   steady_time_point_t start_time_steady;
 };
 
-union CompressionSideChannel {
-  uint64_t initial_value;
-  uint64_t initial_time;
-  size_t simple8b_uncompressed_size;
-  size_t rle_uncompressed_size;
-};
+using CompressionSideChannel = std::variant<uint64_t, size_t>;
+
+// union CompressionSideChannel {
+//   uint64_t initial_value;
+//   uint64_t initial_time;
+//   size_t simple8b_uncompressed_size;
+//   size_t rle_uncompressed_size;
+// };
 
 struct CompressedDataFrame {
   std::vector<CompressionSideChannel> side_channel;
