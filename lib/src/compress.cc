@@ -43,11 +43,11 @@ bool DeltaDecode(int32_t *encoded, size_t count, uint64_t initial, uint64_t *dec
   for (size_t i = 0; i < count; i++) {
     if (__builtin_expect(encoded[i] > 0 && last > std::numeric_limits<uint64_t>::max() - encoded[i],
                          false)) {
-      printf("OVERFLOW last=%" PRIu64 "encoded=%d\n", last, encoded[i]);
+      printf("OVERFLOW last=%" PRIu64 "encoded=%" PRIi32 "\n", last, encoded[i]);
       return false;
     }
     if (__builtin_expect(encoded[i] < 0 && -encoded[i] > last, false)) {
-      printf("UNDERFLOW last=%" PRIu64 " encoded=%d\n", last, encoded[i]);
+      printf("UNDERFLOW last=%" PRIu64 " encoded=%" PRIi32 "\n", last, encoded[i]);
       return false;
     }
     decoded[i] = last + encoded[i];
