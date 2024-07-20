@@ -2,3 +2,6 @@
 	path = bind/pybind11
 	url = https://github.com/pybind/pybind11
 	branch = stable
+[submodule "lib/extern/nlohmann_json"]
+	path = lib/extern/nlohmann_json
+	url = https://github.com/nlohmann/json.git
