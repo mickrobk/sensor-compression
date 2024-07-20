@@ -25,7 +25,7 @@ std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& referen
     mem.ua[i] = static_cast<uint64_t>(std::round(pack(values_[i])));
   }
   for (auto& c : reference.value_compressions) {
-    std::optional<CompressionSideChannel> side_channel;
+    std::optional<uint64_t> side_channel;
     if (!Compress(c, mem, side_channel)) return std::nullopt;
     if (side_channel) {
       result.side_channel.push_back(*side_channel);
@@ -41,7 +41,7 @@ std::optional<CompressedDataFrame> DataFrame::Compress(const DataHeader& referen
     mem.ua[i] = ToMs(times_[i]);
   }
   for (auto& c : reference.time_compressions) {
-    std::optional<CompressionSideChannel> side_channel;
+    std::optional<uint64_t> side_channel;
     if (!Compress(c, mem, side_channel)) return std::nullopt;
     if (side_channel) {
       result.side_channel.push_back(*side_channel);
@@ -60,7 +60,7 @@ std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
   DataFrame result;
   CompressionMemory mem(data.values.size() / sizeof(uint64_t));
   auto side_channel_it = data.side_channel.rbegin();
-  std::optional<CompressionSideChannel> side_channel;
+  std::optional<uint64_t> side_channel;
   auto maybe_update_side_channel = [&]() {
     if (side_channel.has_value() || side_channel_it == data.side_channel.rend()) return;
     side_channel = *side_channel_it;
@@ -75,7 +75,7 @@ std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
     if (!Decompress(*it, mem, side_channel)) return std::nullopt;
   }
   for (auto& time : mem.ua) {
-    result.times_.push_back(FromMs(time));
+    result.times_.push_back(SteadyFromMs(time));
   }
 
   ///////
@@ -99,14 +99,14 @@ std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
 }
 
 bool DataFrame::Decompress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
-                           std::optional<CompressionSideChannel>& side_channel) {
+                           std::optional<uint64_t>& side_channel) {
   switch (compression_type) {
     case DataHeader::CompressionType::kSimple8b: {
       if (!side_channel) {
         printf("kSimple8b missing side channel\n");
         return false;
       }
-      auto uncompressed_size = std::get<size_t>(*side_channel);
+      auto uncompressed_size = *side_channel;
       side_channel = std::nullopt;
       mem.resize(uncompressed_size);
       size_t out_len = Simple8bDecode(mem.ua.data(), uncompressed_size, mem.ub.data());
@@ -122,7 +122,7 @@ bool DataFrame::Decompress(DataHeader::CompressionType compression_type, Compres
         printf("DeltaZigZag missing side channel\n");
         return false;
       }
-      auto initial_value = std::get<uint64_t>(*side_channel);
+      auto& initial_value = *side_channel;
       side_channel = std::nullopt;
       for (int i = 0; i < mem.size; i++) {
         mem.sa[i] = static_cast<int32_t>(mem.ua[i]);
@@ -137,7 +137,7 @@ bool DataFrame::Decompress(DataHeader::CompressionType compression_type, Compres
         printf("RLE missing side channel\n");
         return false;
       }
-      auto uncompressed_size = std::get<size_t>(*side_channel);
+      auto& uncompressed_size = *side_channel;
       auto compressed_size = mem.ua.size();
       side_channel = std::nullopt;
       mem.resize(uncompressed_size);
@@ -152,7 +152,7 @@ bool DataFrame::Decompress(DataHeader::CompressionType compression_type, Compres
   return false;
 }
 bool DataFrame::Compress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
-                         std::optional<CompressionSideChannel>& side_channel) const {
+                         std::optional<uint64_t>& side_channel) const {
   switch (compression_type) {
     case DataHeader::CompressionType::kSimple8b: {
       side_channel = mem.ua.size();
@@ -165,10 +165,8 @@ bool DataFrame::Compress(DataHeader::CompressionType compression_type, Compressi
       ZigZagEncode(mem.ua.data(), mem.size);
       return true;
     case DataHeader::CompressionType::kDeltaZigZag: {
-      side_channel = CompressionSideChannel();
-      uint64_t initial_value = std::get<size_t>(*side_channel);
-      if (!DeltaEncode(mem.ua.data(), mem.ua.size(), &initial_value, mem.sa.data())) return false;
-      side_channel = initial_value;
+      side_channel = 0;
+      if (!DeltaEncode(mem.ua.data(), mem.ua.size(), &*side_channel, mem.sa.data())) return false;
       ZigZagEncode(mem.sa.data(), mem.size);
       for (int i = 0; i < mem.size; i++) {
         mem.ua[i] = static_cast<uint64_t>(mem.sa[i]);

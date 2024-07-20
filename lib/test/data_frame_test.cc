@@ -10,11 +10,11 @@ using namespace sensor_compress;
 
 TEST(DataFrameTest, compressEmpty) {
   DataFrame frame;
-  frame.Record(FromMs(0), 1);
-  frame.Record(FromMs(1), 2);
-  frame.Record(FromMs(2), 2);
-  frame.Record(FromMs(3), 5);
-  frame.Record(FromMs(4), 10);
+  frame.Record(SteadyFromMs(0), 1);
+  frame.Record(SteadyFromMs(1), 2);
+  frame.Record(SteadyFromMs(2), 2);
+  frame.Record(SteadyFromMs(3), 5);
+  frame.Record(SteadyFromMs(4), 10);
   std::vector<uint64_t> ms;
   for (auto& t : frame.Times()) ms.push_back(ToMs(t));
   EXPECT_THAT(frame.Values(), ::testing::ElementsAre(1, 2, 2, 5, 10));
@@ -180,7 +180,7 @@ TEST(DataFrameTest, compressExtendedDeltaRleSimple8b) {
   for (int i = 0; i < 200; i++) {
     values.push_back(1);
     values_inc.push_back(i);
-    times.push_back(FromMs(i));
+    times.push_back(SteadyFromMs(i));
   }
   DataFrame frame, frame_inc;
   for (int i = 0; i < values.size(); i++) {
