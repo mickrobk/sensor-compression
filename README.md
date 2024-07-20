@@ -17,20 +17,6 @@ docker run --rm -it  $(docker build -q -f docker/py/Dockerfile .) python3
 import sensor_compress
 ```
 
-# Analysis
-
-```
-cd <sensor_compress...>
-docker compose --profile dev up --build 
-```
-Access via the link output in the terminal
-
-To get a shell in the analysis server:
-```
-# Must have the container up
-docker compose --profile dev exec analyze sh
-```
-
 # Building
 cmake . -B build -G Ninja  && ninja -C build
 
