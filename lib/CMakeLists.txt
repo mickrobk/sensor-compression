@@ -13,18 +13,9 @@ add_library(lib_sensor_compress ${SOURCES})
 target_link_libraries(lib_sensor_compress nlohmann_json)
 
 # Unit tests
-if (NOT SENSOR_DISABLE_TESTS)
-  include(FetchContent)
-  FetchContent_Declare(
-    googletest
-    # Update from: https://github.com/google/googletest/releases
-    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-  )
-  FetchContent_MakeAvailable(googletest)
-
+if (SENSOR_TEST)
   include_directories(${googletest_SOURCE_DIR}/googletest/include)
   include_directories(${googletest_SOURCE_DIR}/googlemock/include)
-
   enable_testing()
 
   file(GLOB TEST_SOURCES CONFIGURE_DEPENDS test/*.cpp test/*.cc)

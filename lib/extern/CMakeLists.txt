@@ -27,7 +27,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(nlohmann_json expected fmt)
 
-if (NOT SENSOR_DISABLE_TESTS)
+if (SENSOR_TEST)
   FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
