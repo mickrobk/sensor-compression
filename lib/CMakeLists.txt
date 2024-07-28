@@ -10,7 +10,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.cc)
 
 add_library(lib_sensor_compress ${SOURCES})
-target_link_libraries(lib_sensor_compress nlohmann_json)
+target_link_libraries(lib_sensor_compress nlohmann_json expected fmt-header-only)
 
 # Unit tests
 if (SENSOR_TEST)
