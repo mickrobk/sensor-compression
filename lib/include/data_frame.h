@@ -37,9 +37,9 @@ class DataFrame {
   size_t size() const { return times_.size(); }
 
   // Breaks if you do > 1 simple8b in a row
-  std::optional<CompressedDataFrame> Compress(const DataHeader& reference,
-                                              float* value_compression_ratio = nullptr,
-                                              float* time_compression_ratio = nullptr) const;
+  tl::expected<CompressedDataFrame, std::string> Compress(const DataHeader& reference,
+                                                          float* value_compression_ratio = nullptr,
+                                                          float* time_compression_ratio = nullptr) const;
   static std::optional<DataFrame> Decompress(const DataHeader& reference,
                                              const CompressedDataFrame& data);
 
