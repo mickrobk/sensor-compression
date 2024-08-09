@@ -40,8 +40,8 @@ class DataFrame {
   tl::expected<CompressedDataFrame, std::string> Compress(const DataHeader& reference,
                                                           float* value_compression_ratio = nullptr,
                                                           float* time_compression_ratio = nullptr) const;
-  static std::optional<DataFrame> Decompress(const DataHeader& reference,
-                                             const CompressedDataFrame& data);
+  static tl::expected<DataFrame, std::string> Decompress(const DataHeader& reference,
+                                                         const CompressedDataFrame& data);
 
  private:
   struct CompressionMemory {
