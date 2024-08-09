@@ -9,7 +9,11 @@ DataStream::DataStream(std::function<std::string(const CompressedDataFrame&)> co
 bool DataStream::Record(const DataHeader& header, DataFrameValue value) {
   if (current_frame_.size() >= header.frame_size) {
     if (auto compressed = current_frame_.Compress(header)) {
-      past_frames_.push_back(*std::move(compressed));
+      if (compressor_) {
+        string_compressed_frames_.push_back(compressor_(*compressed));
+      } else {
+        past_frames_.push_back(*std::move(compressed));
+      }
       current_frame_.Clear();
       return true;
     } else {
