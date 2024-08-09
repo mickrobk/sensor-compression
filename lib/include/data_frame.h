@@ -11,46 +11,11 @@
 
 #include "compress.h"
 #include "correction.h"
+#include "data_header.h"
 #include "log_container.h"
 #include "time_util.h"
 
 namespace sensor_compress {
-
-static inline unsigned int CountBits(uint v) {
-  unsigned int count = 0;
-  while (v > 0) {
-    count++;
-    v >>= 1;
-  }
-  return count;
-}
-
-struct DataHeader {
-  enum class CompressionType {
-    kSimple8b = 0,     //
-    kZigZag = 1,       //
-    kDeltaZigZag = 2,  //
-    kRLE2 = 3,         //
-    kRLE4 = 4          //
-  };
-  DataHeader() {}
-  DataHeader(uint min, uint max, uint resolution_bits)
-      : min(min), max(max), resolution_bits(resolution_bits) {
-    start_time_utc = std::chrono::system_clock::now();
-    start_time_steady = std::chrono::steady_clock::now();
-  }
-  DataHeader(uint min, uint max) : DataHeader(min, max, CountBits(max - min)) {}
-  std::string name;
-  std::string uuid;
-  uint32_t version = 1;
-  uint min, max;
-  uint8_t resolution_bits;
-  size_t frame_size = 10000;
-  std::vector<CompressionType> value_compressions;
-  std::vector<CompressionType> time_compressions;
-  utc_time_point_t start_time_utc;
-  steady_time_point_t start_time_steady;
-};
 
 struct CompressedDataFrame {
   std::vector<uint64_t> side_channel;
