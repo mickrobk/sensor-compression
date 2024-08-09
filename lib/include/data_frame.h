@@ -10,14 +10,13 @@
 #include <vector>
 
 #include "compress.h"
+#include "compressed_data_frame.h"
 #include "correction.h"
 #include "data_header.h"
 #include "log_container.h"
 #include "time_util.h"
-#include "compressed_data_frame.h"
 
 namespace sensor_compress {
-
 
 struct DataFrameValue {
   steady_time_point_t t;

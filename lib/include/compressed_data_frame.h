@@ -1,15 +1,14 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 namespace sensor_compress {
 
-template <typename Allocator = std::allocator<uint8_t>>
 struct CompressedDataFrame {
-  std::vector<uint64_t, Allocator> side_channel;
-  std::vector<uint8_t, Allocator> values;
-  std::vector<uint8_t, Allocator> times;
+  std::vector<uint64_t> side_channel;
+  std::vector<uint8_t> values;
+  std::vector<uint8_t> times;
 };
 
 }  // namespace sensor_compress
