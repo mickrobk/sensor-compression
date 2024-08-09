@@ -7,6 +7,7 @@
 #include <cstring>
 #include <optional>
 #include <string>
+#include <tl/expected.hpp>
 #include <vector>
 
 #include "compress.h"
