@@ -26,6 +26,7 @@ if (SENSOR_TEST)
   target_link_libraries(
     sensor_test
     GTest::gtest_main
+    GTest::gmock
     lib_sensor_compress
   )
   target_compile_options(sensor_test PRIVATE -fsanitize=address,undefined)

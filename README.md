@@ -18,10 +18,10 @@ import sensor_compress
 ```
 
 # Building
-cmake . -B build -G Ninja  && ninja -C build
+cmake . -B build -G Ninja -DSENSOR_TEST=ON -DSENSOR_BIND=ON  && ninja -C build
 
 ### Running tests
-./build/sensor_compress/lib/sensor_test
+./build/lib/sensor_test 
 
 #### Example test runs
 // Rebuild and run only sensor-compress json tests

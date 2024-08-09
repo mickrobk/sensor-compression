@@ -28,7 +28,7 @@ WORKDIR /app
 COPY . /app
 
 # build python bindings
-RUN cmake . -B bin
+RUN cmake . -B bin -DSENSOR_BIND=ON
 RUN cmake --build bin
 ENV PYTHONPATH "${PYTHONPATH}:/app/bin/bind/"
 
