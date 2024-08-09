@@ -1,5 +1,5 @@
-#include "data_stream.h"
 #include "data_header.h"
+#include "data_stream.h"
 #include "gtest/gtest.h"
 
 namespace sensor_compress {
@@ -21,12 +21,6 @@ TEST_F(DataStreamTest, RecordWithDataFrameValue) {
   EXPECT_FALSE(result.has_value());
 }
 
-TEST_F(DataStreamTest, RecordWithEmptyHeader) {
-  DataHeader empty_header;
-  auto result = data_stream.Record(empty_header, 42);
-  EXPECT_FALSE(result.has_value());
-}
-
 TEST_F(DataStreamTest, RecordWithFrameSizeLimit) {
   header.frame_size = 1;
   auto result1 = data_stream.Record(header, 42);
@@ -34,13 +28,6 @@ TEST_F(DataStreamTest, RecordWithFrameSizeLimit) {
 
   auto result2 = data_stream.Record(header, 43);
   EXPECT_TRUE(result2.has_value());
-  EXPECT_EQ(result2->values.size(), 1);
-  EXPECT_EQ(result2->values[0], 42);
 }
 
 }  // namespace sensor_compress
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

@@ -11,16 +11,11 @@ namespace sensor_compress {
 
 class DataStream {
  public:
-  DataStream(std::function<std::string(const CompressedDataFrame&)> compressor = nullptr);
-
-  bool Record(const DataHeader& header, DataFrameValue value);
-  bool Record(const DataHeader& header, uint value);
+  std::optional<CompressedDataFrame> Record(const DataHeader& header, DataFrameValue value);
+  std::optional<CompressedDataFrame> Record(const DataHeader& header, uint value);
 
  private:
   DataFrame current_frame_;
-  std::vector<CompressedDataFrame> raw_past_frames_;
-  std::vector<std::string> string_compressed_frames_;
-  std::function<std::string(const CompressedDataFrame&)> compressor_;
 };
 
 }  // namespace sensor_compress
