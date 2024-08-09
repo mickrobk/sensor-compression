@@ -28,9 +28,14 @@ class Sensor {
       if (auto compressed = maybe_compressed) {
         if (!compressed) return tl::unexpected<std::string>(compressed.error());
 
-        // Todo: get the result from compressed and convert it to json
-        // Then: copy that result json the TString type, then put it into the back
-        // of compressed_values_
+        // Convert the result from compressed to JSON
+        nlohmann::json json_result = *compressed;
+
+        // Copy the JSON result to the TString type
+        TString json_string = json_result.dump();
+
+        // Put the JSON string into the back of compressed_values_
+        compressed_values_.push_back(json_string);
       }
     }
   }
