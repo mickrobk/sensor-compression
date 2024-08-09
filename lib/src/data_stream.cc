@@ -3,6 +3,9 @@
 
 namespace sensor_compress {
 
+DataStream::DataStream(std::function<std::string(const CompressedDataFrame&)> compressor)
+    : compressor_(compressor) {}
+
 bool DataStream::Record(const DataHeader& header, DataFrameValue value) {
   if (current_frame_.size() >= header.frame_size) {
     if (auto compressed = current_frame_.Compress(header)) {
