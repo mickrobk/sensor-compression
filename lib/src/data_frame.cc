@@ -55,8 +55,8 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(const DataHea
 
   return result;
 }
-std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
-                                               const CompressedDataFrame& data) {
+tl::expected<DataFrame, std::string> DataFrame::Decompress(const DataHeader& reference,
+                                                           const CompressedDataFrame& data) {
   DataFrame result;
   CompressionMemory mem(data.values.size() / sizeof(uint64_t));
   auto side_channel_it = data.side_channel.rbegin();
@@ -72,7 +72,7 @@ std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
   for (auto it = reference.time_compressions.rbegin(); it != reference.time_compressions.rend();
        ++it) {
     maybe_update_side_channel();
-    if (!Decompress(*it, mem, side_channel)) return std::nullopt;
+    if (!Decompress(*it, mem, side_channel)) return tl::unexpected("Unspecified dataframe DEcompression error");
   }
   for (auto& time : mem.ua) {
     result.times_.push_back(SteadyFromMs(time));
@@ -88,7 +88,7 @@ std::optional<DataFrame> DataFrame::Decompress(const DataHeader& reference,
   for (auto it = reference.value_compressions.rbegin(); it != reference.value_compressions.rend();
        ++it) {
     maybe_update_side_channel();
-    if (!Decompress(*it, mem, side_channel)) return std::nullopt;
+    if (!Decompress(*it, mem, side_channel)) return tl::unexpected("Unspecified dataframe DEcompression error");
   }
   TLinearTransform<double> unpack(0, std::pow(2, reference.resolution_bits), reference.min,
                                   reference.max);
