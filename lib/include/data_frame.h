@@ -14,14 +14,10 @@
 #include "data_header.h"
 #include "log_container.h"
 #include "time_util.h"
+#include "compressed_data_frame.h"
 
 namespace sensor_compress {
 
-struct CompressedDataFrame {
-  std::vector<uint64_t> side_channel;
-  std::vector<uint8_t> values;
-  std::vector<uint8_t> times;
-};
 
 struct DataFrameValue {
   steady_time_point_t t;
