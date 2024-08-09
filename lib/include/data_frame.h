@@ -69,6 +69,4 @@ class DataFrame {
   std::vector<uint> values_;
 };
 
-#include "data_stream.h"
-
 }  // namespace sensor_compress

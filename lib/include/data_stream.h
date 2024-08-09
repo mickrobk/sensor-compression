@@ -2,10 +2,13 @@
 
 #include <chrono>
 #include <vector>
+
 #include "data_frame.h"
 #include "data_header.h"
 
 namespace sensor_compress {
+
+class Foo {};
 
 class DataStream {
  public:

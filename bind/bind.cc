@@ -1,4 +1,6 @@
 #include <data_frame.h>
+#include <data_header.h>
+#include <data_stream.h>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
