@@ -8,8 +8,6 @@
 
 namespace sensor_compress {
 
-class Foo {};
-
 class DataStream {
  public:
   bool Record(const DataHeader& header, DataFrameValue value);
