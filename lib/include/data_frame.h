@@ -69,28 +69,6 @@ class DataFrame {
   std::vector<uint> values_;
 };
 
-class DataStream {
- public:
-  bool Record(const DataHeader& header, DataFrameValue value) {
-    if (current_frame_.size() >= header.frame_size) {
-      if (auto compressed = current_frame_.Compress(header)) {
-        past_frames_.push_back(*std::move(compressed));
-        current_frame_.Clear();
-        return true;
-      } else {
-        printf("Failed to compress current frame\n");
-        return false;
-      }
-    }
-    return false;
-  }
-  bool Record(const DataHeader& header, uint value) {
-    return Record(header, {std::chrono::steady_clock::now(), value});
-  }
-
- private:
-  DataFrame current_frame_;
-  std::vector<CompressedDataFrame> past_frames_;
-};
+#include "data_stream.h"
 
 }  // namespace sensor_compress
