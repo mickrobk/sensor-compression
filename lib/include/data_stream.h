@@ -18,9 +18,9 @@ class DataStream {
 
  private:
   DataFrame current_frame_;
-  std::vector<CompressedDataFrame> past_frames_;
-  std::function<std::string(const CompressedDataFrame&)> compressor_;
+  std::vector<CompressedDataFrame> raw_past_frames_;
   std::vector<std::string> string_compressed_frames_;
+  std::function<std::string(const CompressedDataFrame&)> compressor_;
 };
 
 }  // namespace sensor_compress

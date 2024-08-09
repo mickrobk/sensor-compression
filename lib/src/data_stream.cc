@@ -1,4 +1,5 @@
 #include "data_stream.h"
+
 #include <cstdio>
 
 namespace sensor_compress {
@@ -12,7 +13,7 @@ bool DataStream::Record(const DataHeader& header, DataFrameValue value) {
       if (compressor_) {
         string_compressed_frames_.push_back(compressor_(*compressed));
       } else {
-        past_frames_.push_back(*std::move(compressed));
+        raw_past_frames_.push_back(*std::move(compressed));
       }
       current_frame_.Clear();
       return true;
