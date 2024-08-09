@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <tl/expected.hpp>
 #include <vector>
 
 #include "data_frame.h"
@@ -11,8 +12,10 @@ namespace sensor_compress {
 
 class DataStream {
  public:
-  std::optional<CompressedDataFrame> Record(const DataHeader& header, DataFrameValue value);
-  std::optional<CompressedDataFrame> Record(const DataHeader& header, uint value);
+  std::optional<tl::expected<CompressedDataFrame, std::string>> Record(const DataHeader& header,
+                                                                       DataFrameValue value);
+  std::optional<tl::expected<CompressedDataFrame, std::string>> Record(const DataHeader& header,
+                                                                       uint value);
 
  private:
   DataFrame current_frame_;
