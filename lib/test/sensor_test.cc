@@ -43,9 +43,13 @@ TEST(SensorTest, UpdateTest) {
   EXPECT_TRUE(json_result.contains("values"));
   EXPECT_TRUE(json_result.contains("times"));
 
-  // Decompress json_result
-  std::vector<uint> decompressed_values = json_result["values"].get<std::vector<uint>>();
-  std::vector<uint> decompressed_times = json_result["times"].get<std::vector<uint>>();
+  // Decompress json_result using DataFrame::Decompress
+  DataFrame frame;
+  frame.Record(SteadyFromMs(0), 0);  // Initialize with dummy data
+  auto decompressed_frame = DataFrame::Decompress(header, json_result);
+  ASSERT_TRUE(decompressed_frame.has_value());
+  const auto& decompressed_values = decompressed_frame->Values();
+  const auto& decompressed_times = decompressed_frame->Times();
 
   // Verify decompressed values
   for (int i = 0; i < header.frame_size; ++i) {
