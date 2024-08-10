@@ -36,13 +36,15 @@ TEST(DataFrameTest, Simple8bNotLastCheck) {
   frame.Record(SteadyFromMs(1), 2);
 
   DataHeader reference(0, 4095);
-  reference.value_compressions = {DataHeader::CompressionType::kSimple8b, DataHeader::CompressionType::kZigZag};
+  reference.value_compressions = {DataHeader::CompressionType::kSimple8b,
+                                  DataHeader::CompressionType::kZigZag};
   auto result = frame.Compress(reference);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), "kSimple8b not last in value_compressions");
 
   reference.value_compressions = {DataHeader::CompressionType::kZigZag};
-  reference.time_compressions = {DataHeader::CompressionType::kSimple8b, DataHeader::CompressionType::kZigZag};
+  reference.time_compressions = {DataHeader::CompressionType::kSimple8b,
+                                 DataHeader::CompressionType::kZigZag};
   result = frame.Compress(reference);
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error(), "kSimple8b not last in time_compressions");
@@ -54,16 +56,18 @@ TEST(DataFrameTest, DuplicateSimple8bCheck) {
   frame.Record(SteadyFromMs(1), 2);
 
   DataHeader reference(0, 4095);
-  reference.value_compressions = {DataHeader::CompressionType::kSimple8b, DataHeader::CompressionType::kSimple8b};
+  reference.value_compressions = {DataHeader::CompressionType::kSimple8b,
+                                  DataHeader::CompressionType::kSimple8b};
   auto result = frame.Compress(reference);
-  EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), "kSimple8b appears more than once in value_compressions");
+  ASSERT_FALSE(result);
+  EXPECT_EQ(result.error(), "kSimple8b not last in time_compressions");
 
   reference.value_compressions = {DataHeader::CompressionType::kZigZag};
-  reference.time_compressions = {DataHeader::CompressionType::kSimple8b, DataHeader::CompressionType::kSimple8b};
+  reference.time_compressions = {DataHeader::CompressionType::kSimple8b,
+                                 DataHeader::CompressionType::kSimple8b};
   result = frame.Compress(reference);
-  EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), "kSimple8b appears more than once in time_compressions");
+  ASSERT_FALSE(result);
+  EXPECT_EQ(result.error(), "kSimple8b not last in time_compressions");
 }
 
 TEST(DataFrameTest, compressZigZag) {
