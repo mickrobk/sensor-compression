@@ -21,8 +21,8 @@ class Sensor {
 
  public:
   virtual ~Sensor() = default;
-  tl::expected<void, std::string> Update(steady_time_point_t timestamp) {
-    auto value = GetValue(timestamp);
+  tl::expected<void, std::string> Update(steady_time_point_t t) {
+    auto value = GetValue(t);
     if (!value) return {};
 
     last_ = *value;
@@ -39,7 +39,7 @@ class Sensor {
   std::optional<DataFrameValue> GetLast() const { return last_; }
 
  protected:
-  virtual std::optional<DataFrameValue> GetValue(steady_time_point_t timestamp) = 0;
+  virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;
 
   DataFrameValue last_;
   DataHeader header_;

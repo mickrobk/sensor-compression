@@ -24,6 +24,10 @@ class TestSensor : public Sensor<std::string> {
 
 TEST(SensorTest, UpdateTest) {
   DataHeader header(0, 100);
+  header.frame_size = 100;
+  header.value_compressions = {DataHeader::CompressionType::kDeltaZigZag,
+                               DataHeader::CompressionType::kRLE2,
+                               DataHeader::CompressionType::kSimple8b};
   TestSensor sensor(header);
 
   sensor.SetNextValue(0);
@@ -38,7 +42,7 @@ TEST(SensorTest, UpdateTest) {
     sensor.Update(SteadyFromMs(1 + i));
   }
 
-  EXPECT_EQ(sensor.CompressedValues().size(), 1);
+  ASSERT_EQ(sensor.CompressedValues().size(), 1);
   nlohmann::json json_result = nlohmann::json::parse(sensor.CompressedValues().back());
   EXPECT_TRUE(json_result.contains("values"));
   EXPECT_TRUE(json_result.contains("times"));

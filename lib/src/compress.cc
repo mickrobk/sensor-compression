@@ -66,10 +66,13 @@ std::optional<size_t> RleEncode(size_t min_run_length, uint64_t *input, size_t c
     out[out_count++] = value;
   };
   while (i < count) {
+    // printf("RLE encode %zu/%zu\n", i, count);
     size_t run_length = 1;
     while (i + run_length < count && input[i] == input[i + run_length]) {
       run_length++;
     }
+    // printf("RLE run_length=%zu\n", run_length);
+    // printf("RLE input[%zu]=%llx\n", i, input[i]);
     if ((input[i] & 0xF800000000000000) != 0) {
       printf("RLE overflow %llx\n", input[i]);
       return std::nullopt;
