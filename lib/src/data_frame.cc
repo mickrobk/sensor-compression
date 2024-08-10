@@ -25,8 +25,12 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(
     mem.ua[i] = static_cast<uint64_t>(std::round(pack(values_[i])));
   }
 
-  // TODO: if DataHeader::CompressionType::kSimple8b appears in reference.value_compressions
-  // it should appear last. If this is not true, return "kSimple8b not last"
+  // Check if kSimple8b appears last in value_compressions
+  auto it = std::find(reference.value_compressions.begin(), reference.value_compressions.end(),
+                      DataHeader::CompressionType::kSimple8b);
+  if (it != reference.value_compressions.end() && it != std::prev(reference.value_compressions.end())) {
+    return tl::unexpected("kSimple8b not last in value_compressions");
+  }
 
   for (auto& c : reference.value_compressions) {
     std::optional<uint64_t> side_channel;
@@ -46,8 +50,12 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(
     mem.ua[i] = ToMs(times_[i]);
   }
 
-  // TODO: if DataHeader::CompressionType::kSimple8b appears in reference.time_compressions
-  // it should appear last. If this is not true, return "kSimple8b not last"
+  // Check if kSimple8b appears last in time_compressions
+  auto it_time = std::find(reference.time_compressions.begin(), reference.time_compressions.end(),
+                           DataHeader::CompressionType::kSimple8b);
+  if (it_time != reference.time_compressions.end() && it_time != std::prev(reference.time_compressions.end())) {
+    return tl::unexpected("kSimple8b not last in time_compressions");
+  }
 
   for (auto& c : reference.time_compressions) {
     std::optional<uint64_t> side_channel;
