@@ -13,25 +13,28 @@ class TestSensor : public Sensor<std::string> {
 
   const std::vector<std::string>& CompressedValues() const { return compressed_values_; }
 
+  void SetNextValue(uint value) { value_ = value; }
+
  protected:
   std::optional<DataFrameValue> GetValue(steady_time_point_t timestamp) override {
-    static uint value = 0;
-    return DataFrameValue{timestamp, value};
+    return DataFrameValue{timestamp, value_};
   }
+  uint value_ = 0;
 };
 
 TEST(SensorTest, UpdateTest) {
   DataHeader header(0, 100);
   TestSensor sensor(header);
 
-  auto now = std::chrono::steady_clock::now();
-  auto result = sensor.Update(now);
-  EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(sensor.GetLast()->value, 1);
+  sensor.SetNextValue(3);
+  auto result = sensor.Update(SteadyFromMs(0));
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(sensor.GetLast()->value, 3);
+  EXPECT_EQ(ToMs(sensor.GetLast()->t), 0);
   EXPECT_EQ(sensor.CompressedValues().size(), 0);
 
   for (int i = 0; i < header.frame_size; ++i) {
-    sensor.Update(now + std::chrono::milliseconds(i));
+    sensor.Update(SteadyFromMs(i));
   }
 
   EXPECT_EQ(sensor.CompressedValues().size(), 1);
