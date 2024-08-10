@@ -34,6 +34,7 @@ TEST(SensorTest, UpdateTest) {
   EXPECT_EQ(sensor.CompressedValues().size(), 0);
 
   for (int i = 0; i < header.frame_size; ++i) {
+    sensor.SetNextValue(3 + i);
     sensor.Update(SteadyFromMs(i));
   }
 
@@ -41,4 +42,6 @@ TEST(SensorTest, UpdateTest) {
   nlohmann::json json_result = nlohmann::json::parse(sensor.CompressedValues().back());
   EXPECT_TRUE(json_result.contains("values"));
   EXPECT_TRUE(json_result.contains("times"));
+
+  // TODO decompress json_result
 }
