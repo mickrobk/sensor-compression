@@ -30,6 +30,24 @@ TEST(DataFrameTest, compressEmpty) {
   EXPECT_FLOAT_EQ(value_compression_ratio, 0.5f);
 }
 
+TEST(DataFrameTest, DuplicateSimple8bCheck) {
+  DataFrame frame;
+  frame.Record(SteadyFromMs(0), 1);
+  frame.Record(SteadyFromMs(1), 2);
+
+  DataHeader reference(0, 4095);
+  reference.value_compressions = {DataHeader::CompressionType::kSimple8b, DataHeader::CompressionType::kSimple8b};
+  auto result = frame.Compress(reference);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), "kSimple8b appears more than once in value_compressions");
+
+  reference.value_compressions = {DataHeader::CompressionType::kZigZag};
+  reference.time_compressions = {DataHeader::CompressionType::kSimple8b, DataHeader::CompressionType::kSimple8b};
+  result = frame.Compress(reference);
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error(), "kSimple8b appears more than once in time_compressions");
+}
+
 TEST(DataFrameTest, compressZigZag) {
   DataFrame frame;
   frame.Record(std::chrono::steady_clock::now(), 1);
