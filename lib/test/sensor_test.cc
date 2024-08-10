@@ -43,5 +43,13 @@ TEST(SensorTest, UpdateTest) {
   EXPECT_TRUE(json_result.contains("values"));
   EXPECT_TRUE(json_result.contains("times"));
 
-  // TODO decompress json_result
+  // Decompress json_result
+  std::vector<uint> decompressed_values = json_result["values"].get<std::vector<uint>>();
+  std::vector<uint> decompressed_times = json_result["times"].get<std::vector<uint>>();
+
+  // Verify decompressed values
+  for (int i = 0; i < header.frame_size; ++i) {
+    EXPECT_EQ(decompressed_values[i], 3 + i);
+    EXPECT_EQ(decompressed_times[i], i);
+  }
 }
