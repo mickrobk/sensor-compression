@@ -16,6 +16,16 @@ struct DataHeader {
     kRLE2 = 3,         //
     kRLE4 = 4          //
   };
+
+  static const std::vector<CompressionType> DefaultValueCompression() {
+    return {DataHeader::CompressionType::kDeltaZigZag, DataHeader::CompressionType::kRLE2,
+            DataHeader::CompressionType::kSimple8b};
+  }
+  static const std::vector<CompressionType> DefaultTimeCompression() {
+    return {DataHeader::CompressionType::kDeltaZigZag, DataHeader::CompressionType::kRLE2,
+            DataHeader::CompressionType::kSimple8b};
+  }
+
   DataHeader();
   DataHeader(uint min, uint max, uint resolution_bits);
   DataHeader(uint min, uint max);

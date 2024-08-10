@@ -25,9 +25,8 @@ class TestSensor : public Sensor<std::string> {
 TEST(SensorTest, UpdateTest) {
   DataHeader header(0, 100);
   header.frame_size = 100;
-  header.value_compressions = {DataHeader::CompressionType::kDeltaZigZag,
-                               DataHeader::CompressionType::kRLE2,
-                               DataHeader::CompressionType::kSimple8b};
+  header.value_compressions = DataHeader::DefaultValueCompression();
+  header.time_compressions = DataHeader::DefaultTimeCompression();
   TestSensor sensor(header);
 
   sensor.SetNextValue(0);

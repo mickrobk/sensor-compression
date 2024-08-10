@@ -11,9 +11,9 @@ void DataFrame::Record(steady_time_point_t t, uint value) {
 const std::vector<uint>& DataFrame::Values() const { return values_; }
 const std::vector<steady_time_point_t>& DataFrame::Times() const { return times_; }
 
-tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(const DataHeader& reference,
-                                                                   float* value_compression_ratio,
-                                                                   float* time_compression_ratio) const {
+tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(
+    const DataHeader& reference, float* value_compression_ratio,
+    float* time_compression_ratio) const {
   CompressedDataFrame result;
   if (values_.empty()) {
     return result;
@@ -24,9 +24,14 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(const DataHea
   for (int i = 0; i < values_.size(); i++) {
     mem.ua[i] = static_cast<uint64_t>(std::round(pack(values_[i])));
   }
+
+  // TODO: if DataHeader::CompressionType::kSimple8b appears in reference.value_compressions
+  // it should appear last. If this is not true, return "kSimple8b not last"
+
   for (auto& c : reference.value_compressions) {
     std::optional<uint64_t> side_channel;
-    if (!Compress(c, mem, side_channel)) return tl::unexpected("Unspecified dataframe compression error");
+    if (!Compress(c, mem, side_channel))
+      return tl::unexpected("Unspecified dataframe compression error");
     if (side_channel) {
       result.side_channel.push_back(*side_channel);
     }
@@ -40,9 +45,14 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(const DataHea
   for (int i = 0; i < times_.size(); i++) {
     mem.ua[i] = ToMs(times_[i]);
   }
+
+  // TODO: if DataHeader::CompressionType::kSimple8b appears in reference.time_compressions
+  // it should appear last. If this is not true, return "kSimple8b not last"
+
   for (auto& c : reference.time_compressions) {
     std::optional<uint64_t> side_channel;
-    if (!Compress(c, mem, side_channel)) return tl::unexpected("Unspecified dataframe compression error");
+    if (!Compress(c, mem, side_channel))
+      return tl::unexpected("Unspecified dataframe compression error");
     if (side_channel) {
       result.side_channel.push_back(*side_channel);
     }
@@ -72,7 +82,8 @@ tl::expected<DataFrame, std::string> DataFrame::Decompress(const DataHeader& ref
   for (auto it = reference.time_compressions.rbegin(); it != reference.time_compressions.rend();
        ++it) {
     maybe_update_side_channel();
-    if (!Decompress(*it, mem, side_channel)) return tl::unexpected("Unspecified dataframe DEcompression error");
+    if (!Decompress(*it, mem, side_channel))
+      return tl::unexpected("Unspecified dataframe DEcompression error");
   }
   for (auto& time : mem.ua) {
     result.times_.push_back(SteadyFromMs(time));
@@ -88,7 +99,8 @@ tl::expected<DataFrame, std::string> DataFrame::Decompress(const DataHeader& ref
   for (auto it = reference.value_compressions.rbegin(); it != reference.value_compressions.rend();
        ++it) {
     maybe_update_side_channel();
-    if (!Decompress(*it, mem, side_channel)) return tl::unexpected("Unspecified dataframe DEcompression error");
+    if (!Decompress(*it, mem, side_channel))
+      return tl::unexpected("Unspecified dataframe DEcompression error");
   }
   TLinearTransform<double> unpack(0, std::pow(2, reference.resolution_bits), reference.min,
                                   reference.max);
