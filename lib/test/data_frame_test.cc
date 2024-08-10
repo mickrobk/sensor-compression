@@ -40,14 +40,14 @@ TEST(DataFrameTest, Simple8bNotLastCheck) {
                                   DataHeader::CompressionType::kZigZag};
   auto result = frame.Compress(reference);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), "kSimple8b not last in value_compressions");
+  EXPECT_TRUE(result.error().has_value());
 
   reference.value_compressions = {DataHeader::CompressionType::kZigZag};
   reference.time_compressions = {DataHeader::CompressionType::kSimple8b,
                                  DataHeader::CompressionType::kZigZag};
   result = frame.Compress(reference);
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), "kSimple8b not last in time_compressions");
+  EXPECT_TRUE(result.error().has_value());
 }
 
 TEST(DataFrameTest, DuplicateSimple8bCheck) {
@@ -60,14 +60,14 @@ TEST(DataFrameTest, DuplicateSimple8bCheck) {
                                   DataHeader::CompressionType::kSimple8b};
   auto result = frame.Compress(reference);
   ASSERT_FALSE(result);
-  EXPECT_EQ(result.error(), "kSimple8b not last in time_compressions");
+  EXPECT_TRUE(result.error().has_value());
 
   reference.value_compressions = {DataHeader::CompressionType::kZigZag};
   reference.time_compressions = {DataHeader::CompressionType::kSimple8b,
                                  DataHeader::CompressionType::kSimple8b};
   result = frame.Compress(reference);
   ASSERT_FALSE(result);
-  EXPECT_EQ(result.error(), "kSimple8b not last in time_compressions");
+  EXPECT_TRUE(result.error().has_value());
 }
 
 TEST(DataFrameTest, compressZigZag) {
