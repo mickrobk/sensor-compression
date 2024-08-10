@@ -13,31 +13,28 @@
 
 namespace sensor_compress {
 
-template <typename TString>
+template <typename TString = std::string>
 class Sensor {
  protected:
   Sensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
-      : header_(header), correction_(correction) {}
+      : header_(header), correction_(std::move(correction)) {}
 
  public:
   virtual ~Sensor() = default;
   tl::expected<void, std::string> Update() {
-    if (auto value = GetValue()) {
-      last_ = *value;
-      auto maybe_compressed = stream_.Record(header_, *value);
-      if (auto compressed = maybe_compressed) {
-        if (!compressed) return tl::unexpected<std::string>(compressed.error());
+    auto value = GetValue();
+    if (!value) return {};
 
-        // Convert the result from compressed to JSON
-        nlohmann::json json_result = *compressed;
+    last_ = *value;
+    auto maybe_compressed = stream_.Record(header_, *value);
+    if (maybe_compressed) {
+      auto compressed = std::move(maybe_compressed.value());
+      if (!compressed) return tl::unexpected{compressed.error()};
 
-        // Copy the JSON result to the TString type
-        TString json_string = json_result.dump();
-
-        // Put the JSON string into the back of compressed_values_
-        compressed_values_.push_back(json_string);
-      }
+      nlohmann::json json_result(*compressed);
+      compressed_values_.push_back(TString(json_result.dump()));
     }
+    return {};
   }
   std::optional<DataFrameValue> GetLast() const { return last_; }
 
@@ -50,5 +47,4 @@ class Sensor {
   DataStream stream_;
   std::vector<TString> compressed_values_;
 };
-
 }  // namespace sensor_compress

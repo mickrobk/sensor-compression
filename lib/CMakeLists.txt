@@ -3,7 +3,7 @@ project(lib_sensor_compress VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
+ 
 add_subdirectory(extern)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -30,6 +30,7 @@ if (SENSOR_TEST)
     lib_sensor_compress
   )
   target_compile_options(sensor_test PRIVATE -fsanitize=address,undefined)
+  target_compile_options(sensor_test PRIVATE -Werror -Wall -Wextra -Wno-sign-compare -Wshadow -Wnon-virtual-dtor -pedantic -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wnull-dereference)
   target_link_options(sensor_test PRIVATE -fsanitize=address,undefined)
   include(GoogleTest)
   gtest_discover_tests(sensor_test)

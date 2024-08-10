@@ -37,9 +37,9 @@ class DataFrame {
   size_t size() const { return times_.size(); }
 
   // Breaks if you do > 1 simple8b in a row
-  tl::expected<CompressedDataFrame, std::string> Compress(const DataHeader& reference,
-                                                          float* value_compression_ratio = nullptr,
-                                                          float* time_compression_ratio = nullptr) const;
+  tl::expected<CompressedDataFrame, std::string> Compress(
+      const DataHeader& reference, float* value_compression_ratio = nullptr,
+      float* time_compression_ratio = nullptr) const;
   static tl::expected<DataFrame, std::string> Decompress(const DataHeader& reference,
                                                          const CompressedDataFrame& data);
 
@@ -49,11 +49,11 @@ class DataFrame {
     std::vector<int32_t> sa;
     size_t size;
     explicit CompressionMemory(size_t size) { resize(size); }
-    void resize(size_t size) {
-      this->size = size;
-      ua.resize(size);
-      ub.resize(size);
-      sa.resize(size);
+    void resize(size_t new_size) {
+      this->size = new_size;
+      ua.resize(new_size);
+      ub.resize(new_size);
+      sa.resize(new_size);
     }
   };
   static bool Decompress(DataHeader::CompressionType compression_type, CompressionMemory& mem,
