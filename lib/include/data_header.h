@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "time_util.h"
-#include "uuid.h"
+#include "uuid_gen.h"
 
 namespace sensor_compress {
 
@@ -32,7 +32,7 @@ struct DataHeader {
   DataHeader(uint min, uint max);
   void SetTimeToNow();
 
-  Uuid session_id = Uuid::Generate();
+  uuids::uuid session_id;  // = Uuid::Generate();
   std::string name;
   uint32_t version = 1;
   uint min, max;

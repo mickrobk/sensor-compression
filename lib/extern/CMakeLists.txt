@@ -25,7 +25,14 @@ FetchContent_Declare(
   GIT_TAG        0c9fce2ffefecfdce794e1859584e25877b7b592 # 11.0.2
 )
 
-FetchContent_MakeAvailable(nlohmann_json expected fmt)
+set(UUID_USING_CXX20_SPAN ON)
+FetchContent_Declare(
+  stduuid
+  GIT_REPOSITORY https://github.com/mariusbancila/stduuid.git
+  GIT_TAG        3afe7193facd5d674de709fccc44d5055e144d7a # 1.2.3
+)
+
+FetchContent_MakeAvailable(nlohmann_json expected fmt stduuid)
 
 if (SENSOR_TEST)
   FetchContent_Declare(
