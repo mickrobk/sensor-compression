@@ -39,7 +39,7 @@ class Sensor {
  protected:
   virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;
   const std::vector<CompressedDataFrame>& CompressedValues() const { return compressed_values_; }
-  tl::expected<void, std::string> MaybeCompressCurrent();
+  tl::expected<void, std::string> MaybeCompressCurrent(bool force);
 
  private:
   DataFrameValue last_;
