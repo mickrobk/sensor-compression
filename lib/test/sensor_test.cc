@@ -58,6 +58,20 @@ TEST(SensorTest, UpdateTest) {
     EXPECT_EQ(decompressed_values[i], i);
     EXPECT_EQ(ToMs(decompressed_times[i]), i);
   }
+  
+  const auto& compressed_frame = readings.frames.back();  
+
+  // Decompress compressed_frame using DataFrame::Decompress  
+  auto decompressed_frame = DataFrame::Decompress(header, compressed_frame);
+  ASSERT_TRUE(decompressed_frame);
+  const auto& decompressed_values = decompressed_frame->Values();
+  const auto& decompressed_times = decompressed_frame->Times();
+
+  // Verify decompressed values
+  for (int i = 0; i < header.frame_size; ++i) {
+    EXPECT_EQ(decompressed_values[i], i);
+    EXPECT_EQ(ToMs(decompressed_times[i]), i);
+  }
 }
 
 TEST(SensorTest, TakeReadingsTest) {
