@@ -48,6 +48,14 @@ class Sensor {
   }
   std::optional<DataFrameValue> GetLast() const { return last_; }
 
+  CompressedSensorReadings TakeReadings() {
+    CompressedSensorReadings readings;
+    readings.header = header_;
+    readings.frames = std::move(compressed_values_);
+    compressed_values_.clear();
+    return readings;
+  }  
+
  protected:
   virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;
 

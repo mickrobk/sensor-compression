@@ -41,8 +41,11 @@ TEST(SensorTest, UpdateTest) {
     sensor.Update(SteadyFromMs(1 + i));
   }
 
-  ASSERT_EQ(sensor.CompressedValues().size(), 1);
-  const auto& compressed_frame = sensor.CompressedValues().back();
+  auto readings = sensor.TakeReadings();
+  ASSERT_EQ(readings.frames.size(), 1);
+  ASSERT_EQ(sensor.CompressedValues().size(), 0);
+  
+  const auto& compressed_frame = readings.frames.back();  
 
   // Decompress compressed_frame using DataFrame::Decompress  
   auto decompressed_frame = DataFrame::Decompress(header, compressed_frame);
