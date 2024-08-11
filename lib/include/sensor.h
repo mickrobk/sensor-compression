@@ -2,6 +2,8 @@
 
 #include <json.h>
 
+#include "sensor.inl"
+
 #include <cstdint>
 #include <string>
 #include <tl/expected.hpp>
