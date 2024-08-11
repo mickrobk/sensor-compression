@@ -1,5 +1,8 @@
 
 #include "sensor.h"
+#include <tl/expected.hpp>
+#include <string>
+#include <vector>
 namespace sensor_compress {
 
 tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
