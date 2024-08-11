@@ -3,6 +3,11 @@
 
 namespace sensor_compress {
 
+void DataFrame::Clear() {
+  times_.clear();
+  values_.clear();
+}
+
 void DataFrame::Record(steady_time_point_t t, uint value) {
   times_.push_back(t);
   values_.push_back(value);
