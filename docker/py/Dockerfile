@@ -17,7 +17,7 @@ WORKDIR /app
 COPY . /app
 
 # build python bindings
-RUN cmake . -B bin -DSENSOR_BIND=ON
+RUN cmake . -B bin -DSENSOR_BIND=ON -DCMAKE_CXX_FLAGS="-fPIC"
 RUN cmake --build bin
 ENV PYTHONPATH "${PYTHONPATH}:/app/bin/bind/"
 

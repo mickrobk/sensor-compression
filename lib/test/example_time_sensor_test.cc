@@ -28,12 +28,12 @@ TEST(ExampleTimeSensorTest, Json) {
   ASSERT_TRUE(readings);
 
   Json j(*readings);
-  // fmt::println("{}", j.dump());
+  fmt::println("{}", j.dump());
   auto compressed_readings = j.get<CompressedSensorReadings>();
   auto decompressed_readings = compressed_readings.Decompress();
   ASSERT_TRUE(decompressed_readings);
-  // fmt::println("-----");
-  // fmt::println("{}", Json(*decompressed_readings).dump());
+  fmt::println("-----");
+  fmt::println("{}", Json(*decompressed_readings).dump());
 }
 
 }  // namespace
