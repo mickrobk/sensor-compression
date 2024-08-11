@@ -31,7 +31,7 @@ class CompressedSensorReadings {
 //
 // implement CompressedSensorReadings --> SensorReadings
 
-template <typename TString = std::string>
+template <typename TString = std::string>  
 class Sensor {
  protected:
   Sensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
@@ -50,7 +50,7 @@ class Sensor {
       if (!compressed) return tl::unexpected{compressed.error()};
       sensor_compress::CompressedDataFrame frame = std::move(compressed.value());
       nlohmann::json json_result(frame);
-      compressed_values_.push_back(TString(json_result.dump()));
+      compressed_values_.push_back(std::move(frame));
     }
     return {};
   }
@@ -63,6 +63,6 @@ class Sensor {
   DataHeader header_;
   CombinedCorrection correction_;
   DataStream stream_;
-  std::vector<TString> compressed_values_;
+  std::vector<CompressedDataFrame> compressed_values_;  
 };
 }  // namespace sensor_compress
