@@ -31,4 +31,22 @@ CompressedSensorReadings Sensor::TakeReadings() {
   return readings;
 }
 
+SensorReadings CompressedSensorReadings::Decompress() const {
+  SensorReadings result;
+  result.header = header;
+  result.values.reserve(frames.size());
+  
+  std::transform(frames.begin(), frames.end(), std::back_inserter(result.values),
+    [&](const CompressedDataFrame& frame) -> DataFrameValue {
+      auto decompressed = frame.Decompress(header);
+      if (!decompressed) {
+        // Handle error, possibly by throwing an exception or returning an empty result
+        return DataFrameValue();
+      }
+      return decompressed.value().Values().back();
+    });
+  
+  return result;
+}
+
 }  // namespace sensor_compress
