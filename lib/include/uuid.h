@@ -1,19 +1,22 @@
+#pragma once
+
 #include <array>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <sstream>
 
+namespace sensor_compress {
 struct Uuid {
   std::array<uint8_t, 16> bytes;
 
   // Generates a random UUID
   static Uuid Generate() {
-    Uuid uuid;
-    std::random_device rd;   // Seed for the random number generator
-    std::mt19937 gen(rd());  // Mersenne Twister engine
-    std::uniform_int_distribution<uint8_t> dis(0, 255);
+    thread_local static std::random_device rd;   // Seed for the random number generator
+    thread_local static std::mt19937 gen(rd());  // Mersenne Twister engine
+    thread_local static std::uniform_int_distribution<uint8_t> dis(0, 255);
 
+    Uuid uuid;
     for (auto& byte : uuid.bytes) {
       byte = dis(gen);
     }
@@ -24,16 +27,5 @@ struct Uuid {
 
     return uuid;
   }
-
-  // Converts the UUID to a string
-  std::string to_string() const {
-    std::stringstream ss;
-    for (size_t i = 0; i < bytes.size(); ++i) {
-      ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i]);
-      if (i == 3 || i == 5 || i == 7 || i == 9) {
-        ss << "-";
-      }
-    }
-    return ss.str();
-  }
 };
+}  // namespace sensor_compress

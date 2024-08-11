@@ -34,7 +34,6 @@ struct DataHeader {
 
   Uuid session_id = Uuid::Generate();
   std::string name;
-  std::string uuid;
   uint32_t version = 1;
   uint min, max;
   uint8_t resolution_bits;

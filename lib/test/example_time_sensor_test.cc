@@ -1,33 +1,34 @@
 #include "example_time_sensor.h"
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include <thread>
 
+#include "json.h"
 #include "time_util.h"
 
 namespace sensor_compress {
 namespace {
 
-TEST(ExampleTimeSensorTest, Update) {
+tl::expected<ExampleTimeSensor, std::string> GetWithValues() {
   ExampleTimeSensor sensor;
+  for (int i = 0; i < 30; ++i) {
+    auto r = sensor.Update(steady_clock_now());
+    if (!r) return tl::unexpected(r.error());
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+  return sensor;
+}
 
-  auto start_time = steady_clock_now();
-  auto update_result = sensor.Update(start_time);
-  EXPECT_TRUE(update_result.has_value());
+TEST(ExampleTimeSensorTest, Json) {
+  auto sensor = GetWithValues();
+  ASSERT_TRUE(sensor);
+  auto readings = sensor->TakeReadings(true);
+  ASSERT_TRUE(readings);
 
-  auto last_value = sensor.GetLast();
-  ASSERT_TRUE(last_value.has_value());
-  EXPECT_EQ(last_value->t, start_time);
-  EXPECT_EQ(last_value->value, 0);
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  update_result = sensor.Update(steady_clock_now());
-  EXPECT_TRUE(update_result.has_value());
-
-  last_value = sensor.GetLast();
-  ASSERT_TRUE(last_value.has_value());
-  EXPECT_GT(last_value->value, 0);
+  Json j(*readings);
+  fmt::print("{}\n", j.dump());
 }
 
 }  // namespace

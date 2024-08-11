@@ -12,7 +12,7 @@ TEST(JsonTest, dataframe) {
   dh1.name = "hi";
   dh1.value_compressions = {DataHeader::CompressionType::kSimple8b,
                             DataHeader::CompressionType::kRLE2};
-  auto jdh = json(dh1);
+  auto jdh = Json(dh1);
   EXPECT_EQ(jdh["name"], "hi");
   EXPECT_EQ(jdh["version"], 1);
   EXPECT_THAT(jdh["value_compressions"], testing::ElementsAre(0, 3));
