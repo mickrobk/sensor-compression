@@ -2,6 +2,15 @@
 
 namespace sensor_compress {
 
+DataHeader ExampleTimeSensor::StandardHeader() {
+  DataHeader header(0, std::pow(2, 32) - 1, 32);
+  header.name = "example time sensor";
+  header.value_compressions = DataHeader::DefaultValueCompression();
+  header.time_compressions = DataHeader::DefaultTimeCompression();
+  header.frame_size = 10;
+  return header;
+}
+
 ExampleTimeSensor::ExampleTimeSensor(DataHeader header) : Sensor(header) {
   startup_time_ = steady_clock_now();
 }

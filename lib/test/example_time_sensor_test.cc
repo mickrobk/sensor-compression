@@ -10,9 +10,7 @@ namespace sensor_compress {
 namespace {
 
 TEST(ExampleTimeSensorTest, Update) {
-  DataHeader header;
-  header.frame_size = 10;
-  ExampleTimeSensor sensor(header);
+  ExampleTimeSensor sensor;
 
   auto start_time = steady_clock_now();
   auto update_result = sensor.Update(start_time);

@@ -7,7 +7,8 @@ namespace sensor_compress {
 
 class ExampleTimeSensor : public Sensor {
  public:
-  explicit ExampleTimeSensor(DataHeader header);
+  static DataHeader StandardHeader();
+  explicit ExampleTimeSensor(DataHeader header = StandardHeader());
 
  protected:
   std::optional<DataFrameValue> GetValue(steady_time_point_t t) override;
