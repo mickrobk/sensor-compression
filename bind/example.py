@@ -15,10 +15,9 @@ expected_json_decompressed_readings = '{"header":{"frame_size":1000,"max":429496
 json_decompressed_readings = sensor.decompressSensorReadings(json_compressed_readings)
 readings = json.loads(json_decompressed_readings, object_hook=lambda d: SimpleNamespace(**d))
 readings_utc = datetime.fromtimestamp(readings.header.start_time_utc / 1000, tz=timezone.utc)
+readings_mt = readings_utc.astimezone(pytz.timezone('America/Denver'))
 
 assert(json_decompressed_readings == expected_json_decompressed_readings)
-mountain_zone = pytz.timezone('America/Denver')
-
-print('the decompressed object has {} values recorded from session id {}'.format(len(readings.values), readings.header.session_id))
-print('those values are: {}'.format([x.value for x in readings.values]))
-print('it was recorded at {} MT'.format(readings_utc.astimezone(mountain_zone)))
+print('The decompressed object has {} values recorded from session id {}'.format(len(readings.values), readings.header.session_id))
+print('Those values are: {}'.format([x.value for x in readings.values]))
+print('It was recorded at {} MT'.format(readings_mt))
