@@ -8,8 +8,7 @@ using namespace sensor_compress;
 
 class TestSensor : public Sensor {
  public:
-  TestSensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
-      : Sensor(header, std::move(correction)) {}
+  TestSensor(DataHeader header) : Sensor(header) {}
 
   void SetNextValue(uint value) { value_ = value; }
 

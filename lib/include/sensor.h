@@ -25,8 +25,7 @@ struct CompressedSensorReadings {
 
 class Sensor {
  protected:
-  Sensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
-      : header_(header), correction_(std::move(correction)) {}
+  explicit Sensor(DataHeader header) : header_(header) {}
 
  public:
   virtual ~Sensor() = default;
@@ -44,7 +43,6 @@ class Sensor {
  private:
   DataFrameValue last_;
   DataHeader header_;
-  CombinedCorrection correction_;
   DataFrame current_frame_;
   std::vector<CompressedDataFrame> compressed_values_;
 };
