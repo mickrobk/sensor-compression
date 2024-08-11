@@ -22,7 +22,6 @@ struct CompressedSensorReadings {
   std::vector<CompressedDataFrame> frames;
 };
 
-template <typename TString = std::string>
 class Sensor {
  protected:
   Sensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
@@ -47,7 +46,5 @@ class Sensor {
   DataFrame current_frame_;
   std::vector<CompressedDataFrame> compressed_values_;
 };
-
-#include "sensor.inl"
 
 }  // namespace sensor_compress

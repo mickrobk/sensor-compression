@@ -1,6 +1,8 @@
 
-template <typename TString>
-tl::expected<void, std::string> Sensor<TString>::Update(steady_time_point_t t) {
+#include "sensor.h"
+namespace sensor_compress {
+
+tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
   if (current_frame_.size() >= header_.frame_size) {
     auto compressed_current = current_frame_.Compress(header_);
     current_frame_.Clear();
@@ -16,11 +18,12 @@ tl::expected<void, std::string> Sensor<TString>::Update(steady_time_point_t t) {
   return {};
 }
 
-template <typename TString>
-CompressedSensorReadings Sensor<TString>::TakeReadings() {
+CompressedSensorReadings Sensor::TakeReadings() {
   CompressedSensorReadings readings;
   readings.header = header_;
   readings.frames = std::move(compressed_values_);
   compressed_values_.clear();
   return readings;
 }
+
+}  // namespace sensor_compress
