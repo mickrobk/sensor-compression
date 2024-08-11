@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "compress.h"
-#include "compressed_data_frame.h"
 #include "correction.h"
 #include "data_header.h"
 #include "log_container.h"
@@ -22,6 +21,12 @@ namespace sensor_compress {
 struct DataFrameValue {
   steady_time_point_t t;
   uint value;
+};
+
+struct CompressedDataFrame {
+  std::vector<uint64_t> side_channel;
+  std::vector<uint8_t> values;
+  std::vector<uint8_t> times;
 };
 
 class DataFrame {
