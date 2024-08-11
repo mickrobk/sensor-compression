@@ -30,6 +30,8 @@ struct DataHeader {
   DataHeader();
   DataHeader(uint min, uint max, uint resolution_bits);
   DataHeader(uint min, uint max);
+  void SetTimeToNow();
+
   Uuid session_id = Uuid::Generate();
   std::string name;
   std::string uuid;

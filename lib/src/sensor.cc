@@ -1,7 +1,8 @@
 
 #include "sensor.h"
-#include <tl/expected.hpp>
+
 #include <string>
+#include <tl/expected.hpp>
 #include <vector>
 namespace sensor_compress {
 
@@ -11,6 +12,7 @@ tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
     current_frame_.Clear();
     if (!compressed_current) return tl::unexpected{compressed_current.error()};
     compressed_values_.push_back(std::move(compressed_current.value()));
+    header_.SetTimeToNow();
   }
 
   auto value = GetValue(t);

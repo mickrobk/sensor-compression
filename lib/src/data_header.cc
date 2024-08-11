@@ -15,6 +15,10 @@ DataHeader::DataHeader() {}
 
 DataHeader::DataHeader(uint min, uint max, uint resolution_bits)
     : min(min), max(max), resolution_bits(resolution_bits) {
+  SetTimeToNow();
+}
+
+void DataHeader::SetTimeToNow() {
   start_time_utc = std::chrono::system_clock::now();
   start_time_steady = std::chrono::steady_clock::now();
 }
