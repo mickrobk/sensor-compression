@@ -24,7 +24,7 @@ tl::expected<ExampleTimeSensor, std::string> GetWithValues() {
 TEST(ExampleTimeSensorTest, Json) {
   auto sensor = GetWithValues();
   ASSERT_TRUE(sensor);
-  auto readings = sensor->Take(true);
+  auto readings = sensor->TakeHistory(true);
   ASSERT_TRUE(readings);
 
   Json j(*readings);

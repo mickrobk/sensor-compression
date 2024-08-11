@@ -35,7 +35,7 @@ class Sensor {
   tl::expected<void, std::string> Update(steady_time_point_t t);
   std::optional<DataFrameValue> GetLast() const { return last_; }
 
-  tl::expected<CompressedSensorReadings, std::string> Take(bool flush = false);
+  tl::expected<CompressedSensorReadings, std::string> TakeHistory(bool flush = false);
 
  protected:
   virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;
