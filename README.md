@@ -25,4 +25,6 @@ cmake . -B build -G Ninja -DSENSOR_TEST=ON -DSENSOR_BIND=ON  && ninja -C build
 
 #### Example test runs
 // Rebuild and run only sensor-compress json tests
-ninja -C build && ./build/sensor_compress/lib/sensor_test --gtest_filter="JsonTest*"
+clear && cmake . -DSENSOR_TEST=ON -DSENSOR_BIND=ON -B build -G Ninja  && ninja -C build  && ./build/lib/sensor_test 
+
+// Filter like so: --gtest_filter="JsonTest*"
