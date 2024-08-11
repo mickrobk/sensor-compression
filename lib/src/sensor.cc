@@ -31,21 +31,22 @@ CompressedSensorReadings Sensor::TakeReadings() {
   return readings;
 }
 
-SensorReadings CompressedSensorReadings::Decompress() const {
+tl::expected<SensorReadings, std::string> CompressedSensorReadings::Decompress() const {
   SensorReadings result;
   result.header = header;
-  result.values.reserve(frames.size());
-  
-  std::transform(frames.begin(), frames.end(), std::back_inserter(result.values),
-    [&](const CompressedDataFrame& frame) -> DataFrameValue {
-      auto decompressed = frame.Decompress(header);
-      if (!decompressed) {
-        // Handle error, possibly by throwing an exception or returning an empty result
-        return DataFrameValue();
-      }
-      return decompressed.value().Values().back();
-    });
-  
+
+  for (const auto& frame : frames) {
+    auto decompressed = DataFrame::Decompress(header, frame);
+    if (!decompressed) {
+      return tl::unexpected{decompressed.error()};
+    }
+    const auto& v = decompressed->Values();
+    const auto& t = decompressed->Times();
+    for (size_t i = 0; i < v.size(); ++i) {
+      result.values.push_back({t[i], v[i]});
+    }
+  }
+
   return result;
 }
 

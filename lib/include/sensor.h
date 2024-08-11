@@ -1,8 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <string>
-#include <algorithm>
 #include <tl/expected.hpp>
 
 #include "correction.h"
@@ -20,7 +20,7 @@ struct CompressedSensorReadings {
   DataHeader header;
   std::vector<CompressedDataFrame> frames;
 
-  SensorReadings Decompress() const;
+  tl::expected<SensorReadings, std::string> Decompress() const;
 };
 
 class Sensor {
