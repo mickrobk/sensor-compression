@@ -59,3 +59,29 @@ TEST(SensorTest, UpdateTest) {
     EXPECT_EQ(ToMs(decompressed_times[i]), i);
   }
 }
+
+TEST(SensorTest, TakeReadingsTest) {
+  DataHeader header(0, 100);
+  header.frame_size = 100;
+  header.value_compressions = DataHeader::DefaultValueCompression();
+  header.time_compressions = DataHeader::DefaultTimeCompression();
+  TestSensor sensor(header);
+
+  for (int i = 0; i < 2 * header.frame_size; ++i) {
+    sensor.SetNextValue(i);
+    sensor.Update(SteadyFromMs(i));
+  }
+
+  auto readings1 = sensor.TakeReadings();
+  ASSERT_EQ(readings1.frames.size(), 1);
+  ASSERT_EQ(sensor.CompressedValues().size(), 0);
+
+  for (int i = 0; i < header.frame_size; ++i) {
+    sensor.SetNextValue(i);
+    sensor.Update(SteadyFromMs(i));
+  }
+
+  auto readings2 = sensor.TakeReadings();
+  ASSERT_EQ(readings2.frames.size(), 1);
+  ASSERT_EQ(sensor.CompressedValues().size(), 0);
+}
