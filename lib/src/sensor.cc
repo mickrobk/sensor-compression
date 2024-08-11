@@ -7,13 +7,14 @@
 namespace sensor_compress {
 
 tl::expected<void, std::string> Sensor::MaybeCompressCurrent(bool force) {
-  if (force || current_frame_.size() >= header_.frame_size) {
+  if ((force && current_frame_.size() > 0) || current_frame_.size() >= header_.frame_size) {
     auto compressed_current = current_frame_.Compress(header_);
     current_frame_.Clear();
     if (!compressed_current) return tl::unexpected{compressed_current.error()};
     compressed_values_.push_back(std::move(compressed_current.value()));
     header_.SetTimeToNow();
   }
+  return {};
 }
 
 tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {

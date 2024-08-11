@@ -44,10 +44,10 @@ TEST(SensorTest, UpdateTest) {
   }
 
   auto readings = sensor.TakeReadings();
-  ASSERT_EQ(readings.frames.size(), 1);
+  ASSERT_EQ(readings->frames.size(), 1);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 
-  const auto& compressed_frame = readings.frames.back();
+  const auto& compressed_frame = readings->frames.back();
 
   // Decompress compressed_frame using DataFrame::Decompress
   auto decompressed_frame = DataFrame::Decompress(header, compressed_frame);
@@ -75,9 +75,9 @@ TEST(SensorTest, DecompressTest) {
   }
 
   auto readings = sensor.TakeReadings();
-  ASSERT_EQ(readings.frames.size(), 1);
+  ASSERT_EQ(readings->frames.size(), 1);
 
-  auto decompressed = readings.Decompress();
+  auto decompressed = readings->Decompress();
   ASSERT_TRUE(decompressed.has_value());
 
   const auto& values = decompressed->values;
@@ -103,7 +103,7 @@ TEST(SensorTest, TakeReadingsTest) {
 
   auto readings1 = sensor.TakeReadings(true);
   ASSERT_TRUE(readings1.has_value());
-  ASSERT_EQ(readings1.frames.size(), 1);
+  ASSERT_EQ(readings1->frames.size(), 2);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 
   for (int i = 0; i < header.frame_size; ++i) {
@@ -113,6 +113,6 @@ TEST(SensorTest, TakeReadingsTest) {
 
   auto readings2 = sensor.TakeReadings(true);
   ASSERT_TRUE(readings2.has_value());
-  ASSERT_EQ(readings2.frames.size(), 1);
+  ASSERT_EQ(readings2->frames.size(), 1);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 }
