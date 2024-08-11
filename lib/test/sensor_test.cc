@@ -42,7 +42,7 @@ TEST(SensorTest, UpdateTest) {
     sensor.Update(SteadyFromMs(1 + i));
   }
 
-  auto readings = sensor.TakeReadings();
+  auto readings = sensor.Take();
   ASSERT_EQ(readings->frames.size(), 1);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 
@@ -73,7 +73,7 @@ TEST(SensorTest, DecompressTest) {
     sensor.Update(SteadyFromMs(i));
   }
 
-  auto readings = sensor.TakeReadings();
+  auto readings = sensor.Take();
   ASSERT_EQ(readings->frames.size(), 1);
 
   auto decompressed = readings->Decompress();
@@ -100,7 +100,7 @@ TEST(SensorTest, TakeReadingsTest) {
     sensor.Update(SteadyFromMs(i));
   }
 
-  auto readings1 = sensor.TakeReadings(true);
+  auto readings1 = sensor.Take(true);
   ASSERT_TRUE(readings1.has_value());
   ASSERT_EQ(readings1->frames.size(), 2);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
@@ -110,7 +110,7 @@ TEST(SensorTest, TakeReadingsTest) {
     sensor.Update(SteadyFromMs(i));
   }
 
-  auto readings2 = sensor.TakeReadings(true);
+  auto readings2 = sensor.Take(true);
   ASSERT_TRUE(readings2.has_value());
   ASSERT_EQ(readings2->frames.size(), 1);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
