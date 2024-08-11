@@ -8,11 +8,6 @@ void DataFrame::Clear() {
   values_.clear();
 }
 
-void DataFrame::Clear() {
-  times_.clear();
-  values_.clear();
-}
-
 void DataFrame::Record(steady_time_point_t t, uint value) {
   times_.push_back(t);
   values_.push_back(value);
@@ -38,7 +33,8 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(
   // Check if kSimple8b appears last in value_compressions
   auto it = std::find(reference.value_compressions.begin(), reference.value_compressions.end(),
                       DataHeader::CompressionType::kSimple8b);
-  if (it != reference.value_compressions.end() && it != std::prev(reference.value_compressions.end())) {
+  if (it != reference.value_compressions.end() &&
+      it != std::prev(reference.value_compressions.end())) {
     return tl::unexpected("kSimple8b not last in value_compressions");
   }
 
@@ -63,7 +59,8 @@ tl::expected<CompressedDataFrame, std::string> DataFrame::Compress(
   // Check if kSimple8b appears last in time_compressions
   auto it_time = std::find(reference.time_compressions.begin(), reference.time_compressions.end(),
                            DataHeader::CompressionType::kSimple8b);
-  if (it_time != reference.time_compressions.end() && it_time != std::prev(reference.time_compressions.end())) {
+  if (it_time != reference.time_compressions.end() &&
+      it_time != std::prev(reference.time_compressions.end())) {
     return tl::unexpected("kSimple8b not last in time_compressions");
   }
 

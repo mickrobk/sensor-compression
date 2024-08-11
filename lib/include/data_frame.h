@@ -33,10 +33,7 @@ class DataFrame {
  public:
   void Record(DataFrameValue value) { Record(value.t, value.value); }
   void Record(steady_time_point_t, uint value);
-  void Clear() {
-    times_.clear();
-    values_.clear();
-  }
+  void Clear();
   const std::vector<uint>& Values() const;
   const std::vector<steady_time_point_t>& Times() const;
   size_t size() const { return times_.size(); }
