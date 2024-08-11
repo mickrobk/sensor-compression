@@ -18,6 +18,8 @@ struct SensorReadings {
 struct CompressedSensorReadings {
   DataHeader header;
   std::vector<CompressedDataFrame> frames;
+
+  SensorReadings Decompress() const;
 };
 
 class Sensor {
