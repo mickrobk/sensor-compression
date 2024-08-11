@@ -29,7 +29,13 @@ tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
   return {};
 }
 
-CompressedSensorReadings Sensor::TakeReadings() {
+CompressedSensorReadings Sensor::TakeReadings(bool force) {
+  if (force) {
+    auto compress_result = MaybeCompressCurrent(true);
+    if (!compress_result) {
+      // Handle error
+    }
+  }
   CompressedSensorReadings readings;
   readings.header = header_;
   readings.frames = std::move(compressed_values_);

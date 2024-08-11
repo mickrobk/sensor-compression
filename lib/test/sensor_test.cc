@@ -101,7 +101,7 @@ TEST(SensorTest, TakeReadingsTest) {
     sensor.Update(SteadyFromMs(i));
   }
 
-  auto readings1 = sensor.TakeReadings();
+  auto readings1 = sensor.TakeReadings(true);
   ASSERT_EQ(readings1.frames.size(), 1);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 
@@ -110,7 +110,7 @@ TEST(SensorTest, TakeReadingsTest) {
     sensor.Update(SteadyFromMs(i));
   }
 
-  auto readings2 = sensor.TakeReadings();
+  auto readings2 = sensor.TakeReadings(true);
   ASSERT_EQ(readings2.frames.size(), 1);
   ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 }
