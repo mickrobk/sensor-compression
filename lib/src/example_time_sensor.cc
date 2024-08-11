@@ -3,11 +3,11 @@
 namespace sensor_compress {
 
 ExampleTimeSensor::ExampleTimeSensor(DataHeader header) : Sensor(header) {
-  startup_time_ = steady_time_point_t::now();
+  startup_time_ = steady_clock_now();
 }
 
 std::optional<DataFrameValue> ExampleTimeSensor::GetValue(steady_time_point_t t) {
-  return {t, ToMs(steady_time_point_t::now() - startup_time_)};
+  return DataFrameValue{t, static_cast<uint32_t>(ToMs(steady_clock_now()) - ToMs(startup_time_))};
 }
 
 }  // namespace sensor_compress
