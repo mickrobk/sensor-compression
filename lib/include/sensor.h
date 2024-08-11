@@ -9,7 +9,6 @@
 #include "correction.h"
 #include "data_frame.h"
 #include "data_header.h"
-#include "data_stream.h"
 
 namespace sensor_compress {
 
@@ -31,19 +30,20 @@ class Sensor {
 
  public:
   virtual ~Sensor() = default;
+
   tl::expected<void, std::string> Update(steady_time_point_t t) {
+    if (current_frame_.size() >= header_.frame_size) {
+      auto compressed_current = current_frame_.Compress(header_);
+      current_frame_.Clear();
+      if (!compressed_current) return tl::unexpected{compressed_current.error()};
+      compressed_values_.push_back(std::move(compressed_current.value()));
+    }
+
     auto value = GetValue(t);
     if (!value) return {};
 
+    current_frame_.Record(*value);
     last_ = *value;
-    auto maybe_compressed = stream_.Record(header_, *value);
-    if (maybe_compressed) {
-      auto compressed = std::move(maybe_compressed.value());
-      if (!compressed) return tl::unexpected{compressed.error()};
-      sensor_compress::CompressedDataFrame frame = std::move(compressed.value());
-      nlohmann::json json_result(frame);
-      compressed_values_.push_back(std::move(frame));
-    }
     return {};
   }
   std::optional<DataFrameValue> GetLast() const { return last_; }
@@ -56,13 +56,14 @@ class Sensor {
     return readings;
   }
 
+ private:
  protected:
   virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;
 
   DataFrameValue last_;
   DataHeader header_;
   CombinedCorrection correction_;
-  DataStream stream_;
+  DataFrame current_frame_;
   std::vector<CompressedDataFrame> compressed_values_;
 };
 }  // namespace sensor_compress
