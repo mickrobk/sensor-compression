@@ -2,11 +2,12 @@
 
 namespace sensor_compress {
 
-ExampleTimeSensor::ExampleTimeSensor(DataHeader header) : Sensor(header) {}
-
-std::optional<DataFrameValue> ExampleTimeSensor::GetValue(steady_time_point_t t) {
-  // TODO: Implement logic to return sensor value at time t
-  return std::nullopt;
+ExampleTimeSensor::ExampleTimeSensor(DataHeader header) : Sensor(header) {
+  startup_time_ = steady_time_point_t::now();
 }
 
-}  // namespace sensor_compress  
+std::optional<DataFrameValue> ExampleTimeSensor::GetValue(steady_time_point_t t) {
+  return {t, ToMs(steady_time_point_t::now() - startup_time_)};
+}
+
+}  // namespace sensor_compress
