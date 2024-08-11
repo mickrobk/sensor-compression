@@ -68,6 +68,8 @@
     "valarray": "cpp",
     "variant": "cpp",
     "algorithm": "cpp",
-    "functional": "cpp"
+    "functional": "cpp",
+    "chrono": "cpp",
+    "random": "cpp"
   }
 }

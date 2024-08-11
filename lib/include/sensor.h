@@ -13,6 +13,24 @@
 
 namespace sensor_compress {
 
+class SensorReadings {
+  DataHeader header;
+  std::vector<DataFrameValue> values;
+};
+
+class CompressedSensorReadings {
+  DataHeader header;
+  std::vector<CompressedDataFrame> frames;
+};
+
+// Sensor --> store frames not json
+// Implement GetAll from sensor -> returns compressedSensorReadings
+// Getall in sensor should increment the header time
+// Check that header refs are not kept below sensor
+// JSON only happens at the CompressedSensorReadings level
+//
+// implement CompressedSensorReadings --> SensorReadings
+
 template <typename TString = std::string>
 class Sensor {
  protected:
@@ -30,8 +48,8 @@ class Sensor {
     if (maybe_compressed) {
       auto compressed = std::move(maybe_compressed.value());
       if (!compressed) return tl::unexpected{compressed.error()};
-
-      nlohmann::json json_result(*compressed);
+      sensor_compress::CompressedDataFrame frame = std::move(compressed.value());
+      nlohmann::json json_result(frame);
       compressed_values_.push_back(TString(json_result.dump()));
     }
     return {};
