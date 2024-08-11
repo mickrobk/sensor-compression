@@ -6,7 +6,7 @@
 
 using namespace sensor_compress;
 
-class TestSensor : public Sensor<std::string> {
+class TestSensor : public Sensor {
  public:
   TestSensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
       : Sensor(header, std::move(correction)) {}
