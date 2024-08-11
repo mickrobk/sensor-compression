@@ -11,9 +11,11 @@ class TestSensor : public Sensor<std::string> {
   TestSensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
       : Sensor(header, std::move(correction)) {}
 
-  const std::vector<CompressedDataFrame>& CompressedValues() const { return compressed_values_; }
-
   void SetNextValue(uint value) { value_ = value; }
+
+  const std::vector<CompressedDataFrame>& TestCompressedValues() const {
+    return CompressedValues();
+  }
 
  protected:
   std::optional<DataFrameValue> GetValue(steady_time_point_t timestamp) override {
@@ -34,7 +36,7 @@ TEST(SensorTest, UpdateTest) {
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(sensor.GetLast()->value, 0);
   EXPECT_EQ(ToMs(sensor.GetLast()->t), 0);
-  EXPECT_EQ(sensor.CompressedValues().size(), 0);
+  EXPECT_EQ(sensor.TestCompressedValues().size(), 0);
 
   for (int i = 0; i < header.frame_size; ++i) {
     sensor.SetNextValue(1 + i);
@@ -43,7 +45,7 @@ TEST(SensorTest, UpdateTest) {
 
   auto readings = sensor.TakeReadings();
   ASSERT_EQ(readings.frames.size(), 1);
-  ASSERT_EQ(sensor.CompressedValues().size(), 0);
+  ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 
   const auto& compressed_frame = readings.frames.back();
 
@@ -74,7 +76,7 @@ TEST(SensorTest, TakeReadingsTest) {
 
   auto readings1 = sensor.TakeReadings();
   ASSERT_EQ(readings1.frames.size(), 1);
-  ASSERT_EQ(sensor.CompressedValues().size(), 0);
+  ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 
   for (int i = 0; i < header.frame_size; ++i) {
     sensor.SetNextValue(i);
@@ -83,5 +85,5 @@ TEST(SensorTest, TakeReadingsTest) {
 
   auto readings2 = sensor.TakeReadings();
   ASSERT_EQ(readings2.frames.size(), 1);
-  ASSERT_EQ(sensor.CompressedValues().size(), 0);
+  ASSERT_EQ(sensor.TestCompressedValues().size(), 0);
 }
