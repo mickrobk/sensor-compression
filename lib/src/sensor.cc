@@ -6,7 +6,7 @@
 #include <vector>
 namespace sensor_compress {
 
-tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
+tl::expected<void, std::string> Sensor::MaybeCompressCurrent() {
   if (current_frame_.size() >= header_.frame_size) {
     auto compressed_current = current_frame_.Compress(header_);
     current_frame_.Clear();
@@ -14,12 +14,18 @@ tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
     compressed_values_.push_back(std::move(compressed_current.value()));
     header_.SetTimeToNow();
   }
+}
 
+tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
   auto value = GetValue(t);
   if (!value) return {};
 
   current_frame_.Record(*value);
   last_ = *value;
+
+  auto compress_result = MaybeCompressCurrent();
+  if (!compress_result) return compress_result;
+
   return {};
 }
 
