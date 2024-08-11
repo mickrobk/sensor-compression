@@ -30,8 +30,8 @@ tl::expected<void, std::string> Sensor::Update(steady_time_point_t t) {
   return {};
 }
 
-tl::expected<CompressedSensorReadings, std::string> Sensor::TakeReadings(bool force) {
-  if (force) {
+tl::expected<CompressedSensorReadings, std::string> Sensor::TakeReadings(bool flush) {
+  if (flush) {
     auto compress_result = MaybeCompressCurrent(true);
     if (!compress_result) {
       return tl::unexpected{compress_result.error()};

@@ -7,7 +7,7 @@ DataHeader ExampleTimeSensor::StandardHeader() {
   header.name = "example time sensor";
   header.value_compressions = DataHeader::DefaultValueCompression();
   header.time_compressions = DataHeader::DefaultTimeCompression();
-  header.frame_size = 10;
+  header.frame_size = 1000;
   return header;
 }
 
