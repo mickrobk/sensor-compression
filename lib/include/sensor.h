@@ -13,12 +13,12 @@
 
 namespace sensor_compress {
 
-class SensorReadings {
+struct SensorReadings {
   DataHeader header;
   std::vector<DataFrameValue> values;
 };
 
-class CompressedSensorReadings {
+struct CompressedSensorReadings {
   DataHeader header;
   std::vector<CompressedDataFrame> frames;
 };
@@ -54,7 +54,7 @@ class Sensor {
     readings.frames = std::move(compressed_values_);
     compressed_values_.clear();
     return readings;
-  }  
+  }
 
  protected:
   virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;

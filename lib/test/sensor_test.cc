@@ -11,7 +11,7 @@ class TestSensor : public Sensor<std::string> {
   TestSensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
       : Sensor(header, std::move(correction)) {}
 
-  const std::vector<CompressedDataFrame>& CompressedValues() const { return compressed_values_; }  
+  const std::vector<CompressedDataFrame>& CompressedValues() const { return compressed_values_; }
 
   void SetNextValue(uint value) { value_ = value; }
 
@@ -44,24 +44,10 @@ TEST(SensorTest, UpdateTest) {
   auto readings = sensor.TakeReadings();
   ASSERT_EQ(readings.frames.size(), 1);
   ASSERT_EQ(sensor.CompressedValues().size(), 0);
-  
-  const auto& compressed_frame = readings.frames.back();  
 
-  // Decompress compressed_frame using DataFrame::Decompress  
-  auto decompressed_frame = DataFrame::Decompress(header, compressed_frame);
-  ASSERT_TRUE(decompressed_frame);
-  const auto& decompressed_values = decompressed_frame->Values();
-  const auto& decompressed_times = decompressed_frame->Times();
+  const auto& compressed_frame = readings.frames.back();
 
-  // Verify decompressed values
-  for (int i = 0; i < header.frame_size; ++i) {
-    EXPECT_EQ(decompressed_values[i], i);
-    EXPECT_EQ(ToMs(decompressed_times[i]), i);
-  }
-  
-  const auto& compressed_frame = readings.frames.back();  
-
-  // Decompress compressed_frame using DataFrame::Decompress  
+  // Decompress compressed_frame using DataFrame::Decompress
   auto decompressed_frame = DataFrame::Decompress(header, compressed_frame);
   ASSERT_TRUE(decompressed_frame);
   const auto& decompressed_values = decompressed_frame->Values();
