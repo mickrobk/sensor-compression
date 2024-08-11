@@ -70,6 +70,7 @@
     "algorithm": "cpp",
     "functional": "cpp",
     "chrono": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "future": "cpp"
   }
 }
