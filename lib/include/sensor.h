@@ -23,15 +23,7 @@ class CompressedSensorReadings {
   std::vector<CompressedDataFrame> frames;
 };
 
-// Sensor --> store frames not json
-// Implement GetAll from sensor -> returns compressedSensorReadings
-// Getall in sensor should increment the header time
-// Check that header refs are not kept below sensor
-// JSON only happens at the CompressedSensorReadings level
-//
-// implement CompressedSensorReadings --> SensorReadings
-
-template <typename TString = std::string>  
+template <typename TString = std::string>
 class Sensor {
  protected:
   Sensor(DataHeader header, CombinedCorrection correction = CombinedCorrection())
@@ -63,6 +55,6 @@ class Sensor {
   DataHeader header_;
   CombinedCorrection correction_;
   DataStream stream_;
-  std::vector<CompressedDataFrame> compressed_values_;  
+  std::vector<CompressedDataFrame> compressed_values_;
 };
 }  // namespace sensor_compress
