@@ -62,6 +62,33 @@ TEST(SensorTest, UpdateTest) {
   }
 }
 
+TEST(SensorTest, DecompressTest) {
+  DataHeader header(0, 100);
+  header.frame_size = 10;
+  header.value_compressions = DataHeader::DefaultValueCompression();
+  header.time_compressions = DataHeader::DefaultTimeCompression();
+  TestSensor sensor(header);
+
+  for (int i = 0; i < header.frame_size; ++i) {
+    sensor.SetNextValue(i);
+    sensor.Update(SteadyFromMs(i));
+  }
+
+  auto readings = sensor.TakeReadings();
+  ASSERT_EQ(readings.frames.size(), 1);
+
+  auto decompressed = readings.Decompress();
+  ASSERT_TRUE(decompressed.has_value());
+
+  const auto& values = decompressed->values;
+  ASSERT_EQ(values.size(), header.frame_size);
+
+  for (int i = 0; i < header.frame_size; ++i) {
+    EXPECT_EQ(values[i].value, i);
+    EXPECT_EQ(ToMs(values[i].t), i);
+  }
+}
+
 TEST(SensorTest, TakeReadingsTest) {
   DataHeader header(0, 100);
   header.frame_size = 100;
