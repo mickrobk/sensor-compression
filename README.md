@@ -12,9 +12,11 @@ Forked from https://github.com/naturalplasmoid/simple8b-timeseries-compression, 
 
 # Python support
 
-docker run --rm -it  $(docker build -q -f docker/py/Dockerfile .) python3
+docker run --rm -it  $(docker build -q -f bind/docker/Dockerfile .) python3
 ```
 import sensor_compress as sensor
+
+## OR import bind.example
 ```
 
 # Building

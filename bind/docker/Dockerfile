@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install pip requirements
-COPY docker/py/requirements.txt .
+COPY bind/docker/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
