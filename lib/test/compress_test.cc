@@ -143,25 +143,27 @@ TEST(CompressTest, rleTime) {
   EXPECT_TRUE(RleDecode(compressed.data(), compressed.size(), foo.data(), orginal_len));
   EXPECT_THAT(foo, ::testing::ElementsAre(a, b, c, d));
 }
-TEST(CompressTest, ToFromBytes) {
-  std::vector<uint64_t> input = {1, 2, 3, 4, 5};
+TEST(CompressTest, ToFromBytes32) {
+  const std::vector<uint64_t> input = {1, 2, 3, 4, 5};
   auto bytes = to_bytes(input);
   EXPECT_EQ(bytes.size(), input.size() * sizeof(uint64_t));
-  
+
   auto result = from_bytes(bytes);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result.value(), input);
+  EXPECT_THAT(*result, testing::ElementsAreArray(input));
 
   bytes.pop_back();
   result = from_bytes(bytes);
   EXPECT_FALSE(result.has_value());
+}
 
+TEST(CompressTest, ToFromBytes64) {
   // Test uint64_t values
-  std::vector<uint64_t> input64 = {0x1122334455667788, 0x99aabbccddeeff00};
+  const std::vector<uint64_t> input64 = {0x1122334455667788, 0x99aabbccddeeff00};
   auto bytes64 = to_bytes(input64);
   EXPECT_EQ(bytes64.size(), input64.size() * sizeof(uint64_t));
 
   auto result64 = from_bytes(bytes64);
   ASSERT_TRUE(result64.has_value());
-  EXPECT_EQ(result64.value(), input64);
+  EXPECT_THAT(*result64, testing::ElementsAreArray(input64));
 }
