@@ -20,6 +20,37 @@
       - Integer safe operations for delta encode/decode
 */
 
+inline void to_bytes(uint64_t x, uint8_t *b) {
+  b[0] = x >> 8 * 0;
+  b[1] = x >> 8 * 1;
+  b[2] = x >> 8 * 2;
+  b[3] = x >> 8 * 3;
+  b[4] = x >> 8 * 4;
+  b[5] = x >> 8 * 5;
+  b[6] = x >> 8 * 6;
+  b[7] = x >> 8 * 7;
+}
+inline std::vector<uint8_t> to_bytes(std::vector<uint64_t> v) {
+  std::vector<uint8_t> result(v.size() * 8);
+  for (size_t i = 0; i < v.size(); i++) {
+    to_bytes(v[i], result.data() + i * 8);
+  }
+  return result;
+}
+tl::expected<std::vector<uint64_t>, std::string> from_bytes(const std::vector<uint8_t> &b) {
+  if (b.size() % 8 != 0) {
+    return tl::make_unexpected("Invalid length");
+  }
+  std::vector<uint64_t> result(b.size() / 8);
+  for (size_t i = 0; i < result.size(); i++) {
+    result[i] = ((uint64_t)b[i * 8 + 0] << 8 * 0) | ((uint64_t)b[i * 8 + 1] << 8 * 1) |
+                ((uint64_t)b[i * 8 + 2] << 8 * 2) | ((uint64_t)b[i * 8 + 3] << 8 * 3) |
+                ((uint64_t)b[i * 8 + 4] << 8 * 4) | ((uint64_t)b[i * 8 + 5] << 8 * 5) |
+                ((uint64_t)b[i * 8 + 6] << 8 * 6) | ((uint64_t)b[i * 8 + 7] << 8 * 7);
+  }
+  return result;
+}
+
 const uint8_t SIMPLE8B_SELECTOR_BITS =
     4;  // number of bits used by Simple8b algorithm to indicate packing scheme
 

@@ -3,6 +3,8 @@ using Json = nlohmann::json;
 
 #include <uuid.h>
 
+#include <base64.hpp>
+
 #include "correction.h"
 #include "data_frame.h"
 #include "sensor.h"

@@ -10,6 +10,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.cc)
 
 add_library(lib_sensor_compress ${SOURCES})
+target_include_directories(lib_sensor_compress INTERFACE ${base64_SOURCE_DIR}/include)
 target_link_libraries(lib_sensor_compress nlohmann_json expected fmt-header-only stduuid)
 
 # Unit tests

@@ -32,7 +32,12 @@ FetchContent_Declare(
   GIT_TAG        3afe7193facd5d674de709fccc44d5055e144d7a # 1.2.3
 )
 
-FetchContent_MakeAvailable(nlohmann_json expected fmt stduuid)
+FetchContent_Declare(
+  base64
+  GIT_REPOSITORY https://github.com/tobiaslocker/base64.git
+)
+
+FetchContent_MakeAvailable(nlohmann_json expected fmt stduuid base64)
 
 if (SENSOR_TEST)
   FetchContent_Declare(

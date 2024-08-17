@@ -34,6 +34,11 @@ TEST(ExampleTimeSensorTest, Json) {
   ASSERT_TRUE(decompressed_readings);
   fmt::println("-----");
   fmt::println("{}", Json(*decompressed_readings).dump());
+
+  for (auto& frame : compressed_readings.frames) {
+    std::string buf = base64::encode_into<std::string>(frame.values.begin(), frame.values.end());
+    fmt::println("b64: {}", buf);
+  }
 }
 
 }  // namespace

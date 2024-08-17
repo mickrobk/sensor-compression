@@ -5,8 +5,13 @@
 #include <algorithm>
 #include <cstddef>
 #include <optional>
+#include <tl/expected.hpp>
 
 namespace sensor_compress {
+
+std::array<uint8_t, 8> to_bytes(uint64_t x);
+std::vector<uint8_t> to_bytes(std::vector<uint64_t> v);
+tl::expected<std::vector<uint64_t>, std::string> from_bytes(const std::vector<uint8_t> &b);
 
 template <typename T>
 size_t Simple8bEncode(T *input, size_t inputLength, uint64_t *out);
