@@ -143,3 +143,16 @@ TEST(CompressTest, rleTime) {
   EXPECT_TRUE(RleDecode(compressed.data(), compressed.size(), foo.data(), orginal_len));
   EXPECT_THAT(foo, ::testing::ElementsAre(a, b, c, d));
 }
+TEST(CompressTest, ToFromBytes) {
+  std::vector<uint64_t> input = {1, 2, 3, 4, 5};
+  auto bytes = to_bytes(input);
+  EXPECT_EQ(bytes.size(), input.size() * sizeof(uint64_t));
+  
+  auto result = from_bytes(bytes);
+  ASSERT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), input);
+
+  bytes.pop_back();
+  result = from_bytes(bytes);
+  EXPECT_FALSE(result.has_value());
+}
