@@ -43,10 +43,10 @@ tl::expected<std::vector<uint64_t>, std::string> from_bytes(const std::vector<ui
   }
   std::vector<uint64_t> result(b.size() / 8);
   for (size_t i = 0; i < result.size(); i++) {
-    result[i] = ((uint64_t)b[i * 8 + 0] << 8 * 0) | ((uint64_t)b[i * 8 + 1] << 8 * 1) |
-                ((uint64_t)b[i * 8 + 2] << 8 * 2) | ((uint64_t)b[i * 8 + 3] << 8 * 3) |
-                ((uint64_t)b[i * 8 + 4] << 8 * 4) | ((uint64_t)b[i * 8 + 5] << 8 * 5) |
-                ((uint64_t)b[i * 8 + 6] << 8 * 6) | ((uint64_t)b[i * 8 + 7] << 8 * 7);
+    result[i] = (static_cast<uint64_t>(b[i * 8 + 0]) << 8 * 0) | (static_cast<uint64_t>(b[i * 8 + 1]) << 8 * 1) |
+                (static_cast<uint64_t>(b[i * 8 + 2]) << 8 * 2) | (static_cast<uint64_t>(b[i * 8 + 3]) << 8 * 3) |
+                (static_cast<uint64_t>(b[i * 8 + 4]) << 8 * 4) | (static_cast<uint64_t>(b[i * 8 + 5]) << 8 * 5) |
+                (static_cast<uint64_t>(b[i * 8 + 6]) << 8 * 6) | (static_cast<uint64_t>(b[i * 8 + 7]) << 8 * 7);
   }
   return result;
 }
