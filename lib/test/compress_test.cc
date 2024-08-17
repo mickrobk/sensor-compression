@@ -155,4 +155,13 @@ TEST(CompressTest, ToFromBytes) {
   bytes.pop_back();
   result = from_bytes(bytes);
   EXPECT_FALSE(result.has_value());
+
+  // Test uint64_t values
+  std::vector<uint64_t> input64 = {0x1122334455667788, 0x99aabbccddeeff00};
+  auto bytes64 = to_bytes(input64);
+  EXPECT_EQ(bytes64.size(), input64.size() * sizeof(uint64_t));
+
+  auto result64 = from_bytes(bytes64);
+  ASSERT_TRUE(result64.has_value());
+  EXPECT_EQ(result64.value(), input64);
 }
