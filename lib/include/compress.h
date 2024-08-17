@@ -9,7 +9,10 @@
 
 namespace sensor_compress {
 
-std::array<uint8_t, 8> to_bytes(uint64_t x);
+std::array<uint8_t, 8> u64_to_bytes(uint64_t x);
+void u64_to_bytes(uint64_t x, uint8_t *b);
+uint64_t u64_from_bytes(const uint8_t *b);
+tl::expected<uint64_t, std::string> u64_from_bytes(const std::vector<uint8_t> &b);
 std::vector<uint8_t> to_bytes(std::vector<uint64_t> v);
 tl::expected<std::vector<uint64_t>, std::string> from_bytes(const std::vector<uint8_t> &b);
 

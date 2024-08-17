@@ -20,7 +20,13 @@
       - Integer safe operations for delta encode/decode
 */
 
-inline void to_bytes(uint64_t x, uint8_t *b) {
+inline std::array<uint8_t, 8> u64_to_bytes(uint64_t x) {
+  std::array<uint8_t, 8> result;
+  u64_to_bytes(x, result.data());
+  return result;
+}
+
+inline void u64_to_bytes(uint64_t x, uint8_t *b) {
   b[0] = x >> 8 * 0;
   b[1] = x >> 8 * 1;
   b[2] = x >> 8 * 2;
@@ -30,10 +36,26 @@ inline void to_bytes(uint64_t x, uint8_t *b) {
   b[6] = x >> 8 * 6;
   b[7] = x >> 8 * 7;
 }
+
+inline uint64_t u64_from_bytes(const uint8_t *b) {
+  return (static_cast<uint64_t>(b[0]) << 8 * 0) | (static_cast<uint64_t>(b[1]) << 8 * 1) |
+         (static_cast<uint64_t>(b[2]) << 8 * 2) | (static_cast<uint64_t>(b[3]) << 8 * 3) |
+         (static_cast<uint64_t>(b[4]) << 8 * 4) | (static_cast<uint64_t>(b[5]) << 8 * 5) |
+         (static_cast<uint64_t>(b[6]) << 8 * 6) | (static_cast<uint64_t>(b[7]) << 8 * 7);
+}
+
+inline tl::expected<uint64_t, std::string> u64_from_bytes(const std::vector<uint8_t> &b) {
+  if (b.size() != 8) {
+    return tl::make_unexpected("Invalid length");
+  }
+
+  return u64_from_bytes(b.data());
+}
+
 inline std::vector<uint8_t> to_bytes(std::vector<uint64_t> v) {
   std::vector<uint8_t> result(v.size() * 8);
   for (size_t i = 0; i < v.size(); i++) {
-    to_bytes(v[i], result.data() + i * 8);
+    u64_to_bytes(v[i], result.data() + i * 8);
   }
   return result;
 }
@@ -43,14 +65,7 @@ inline tl::expected<std::vector<uint64_t>, std::string> from_bytes(const std::ve
   }
   std::vector<uint64_t> result(b.size() / 8);
   for (size_t i = 0; i < result.size(); i++) {
-    result[i] = (static_cast<uint64_t>(b[i * 8 + 0]) << 8 * 0) |
-                (static_cast<uint64_t>(b[i * 8 + 1]) << 8 * 1) |
-                (static_cast<uint64_t>(b[i * 8 + 2]) << 8 * 2) |
-                (static_cast<uint64_t>(b[i * 8 + 3]) << 8 * 3) |
-                (static_cast<uint64_t>(b[i * 8 + 4]) << 8 * 4) |
-                (static_cast<uint64_t>(b[i * 8 + 5]) << 8 * 5) |
-                (static_cast<uint64_t>(b[i * 8 + 6]) << 8 * 6) |
-                (static_cast<uint64_t>(b[i * 8 + 7]) << 8 * 7);
+    result[i] = u64_from_bytes(b.data() + i * 8);
   }
   return result;
 }
