@@ -10,7 +10,7 @@
 namespace sensor_compress {
 
 struct DataHeader {
-  enum class CompressionType {
+  enum class CompressionType : uint8_t {
     kSimple8b = 0,     //
     kZigZag = 1,       //
     kDeltaZigZag = 2,  //

@@ -36,8 +36,14 @@ TEST(ExampleTimeSensorTest, Json) {
   fmt::println("{}", Json(*decompressed_readings).dump());
 
   for (auto& frame : compressed_readings.frames) {
+    std::string buf0 = base64::encode_into<std::string>(frame.times.begin(), frame.times.end());
     std::string buf = base64::encode_into<std::string>(frame.values.begin(), frame.values.end());
-    fmt::println("b64: {}", buf);
+    auto sc_bytes = to_bytes(frame.side_channel);
+    std::string buf2 = base64::encode_into<std::string>(sc_bytes.begin(), sc_bytes.end());
+
+    fmt::println("b64-times: {}", buf0);
+    fmt::println("b64-values: {}", buf);
+    fmt::println("b64-sc: {}", buf2);
   }
 }
 
