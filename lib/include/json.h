@@ -35,18 +35,6 @@ struct adl_serializer<sensor_compress::utc_time_point_t> {
   static void from_json(const Json& j, sensor_compress::utc_time_point_t& p) {
     p = sensor_compress::UTCFromMs(j.template get<uint64_t>());
   }
-
-  // To store as a string...
-  // static void to_json(Json& j, const sensor_compress::utc_time_point_t& p) {
-  //   j = sensor_compress::json_internal::u64_to_b64(sensor_compress::ToMs(p));
-  // }
-
-  // static void from_json(const Json& j, sensor_compress::utc_time_point_t& p) {
-  //   auto u64_or = sensor_compress::json_internal::b64_to_u64(j.template get<std::string>());
-  //   if (u64_or) {
-  //     p = sensor_compress::UTCFromMs(*u64_or);
-  //   }
-  // }
 };
 
 template <>
@@ -72,6 +60,30 @@ struct adl_serializer<uuids::uuid> {
     }
   }
 };
+
+template <>
+struct adl_serializer<sensor_compress::CompressedDataFrame> {
+  static void to_json(Json& j, const sensor_compress::CompressedDataFrame& p) {
+    auto sc_bytes = sensor_compress::to_bytes(p.side_channel);
+    j["values"] = base64::encode_into<std::string>(p.values.begin(), p.values.end());
+    j["times"] = base64::encode_into<std::string>(p.times.begin(), p.times.end());
+    j["side_channel"] = base64::encode_into<std::string>(sc_bytes.begin(), sc_bytes.end());
+  }
+
+  static void from_json(const Json& j, sensor_compress::CompressedDataFrame& p) {
+    auto tvals = j.find("times");
+    auto scvals = j.find("side_channel");
+    auto vvals = j.find("values");
+    if (tvals == j.end() || scvals == j.end() || vvals == j.end()) return;
+    auto sc_or = sensor_compress::from_bytes(
+        base64::decode_into<std::vector<uint8_t>>(scvals->template get<std::string>()));
+    if (!sc_or) return;
+    p.values = base64::decode_into<std::vector<uint8_t>>(vvals->template get<std::string>());
+    p.times = base64::decode_into<std::vector<uint8_t>>(tvals->template get<std::string>());
+    p.side_channel = *sc_or;
+  }
+};
+
 }  // namespace nlohmann
 
 namespace sensor_compress {
@@ -88,12 +100,6 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(DataHeader,          //
                                    time_compressions,   //
                                    start_time_utc,      //
                                    start_time_steady    //
-);
-
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CompressedDataFrame,  //
-                                   side_channel,         //
-                                   values,               //
-                                   times                 //
 );
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CompressedSensorReadings,  //
