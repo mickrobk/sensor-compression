@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <optional>
+#include <string>
 #include <tl/expected.hpp>
 
 namespace sensor_compress {
