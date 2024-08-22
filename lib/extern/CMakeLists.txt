@@ -34,7 +34,7 @@ FetchContent_Declare(
 
 FetchContent_Declare(
   base64
-  GIT_REPOSITORY https://github.com/tobiaslocker/base64.git
+  GIT_REPOSITORY https://github.com/mickrobk/base64.git
 )
 
 FetchContent_MakeAvailable(nlohmann_json expected fmt stduuid base64)
