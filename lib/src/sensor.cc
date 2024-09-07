@@ -41,6 +41,7 @@ tl::expected<CompressedSensorReadings, std::string> Sensor::TakeHistory(bool flu
   readings.header = header_;
   readings.frames = std::move(compressed_values_);
   compressed_values_.clear();
+  header_.intra_session_id = UuidGen::Generate();
   return readings;
 }
 
