@@ -29,7 +29,10 @@ class Sensor {
 
  public:
   virtual ~Sensor() = default;
-  void SetSessionId(uuids::uuid id) { header_.session_id = id; }
+  void SetSessionId(uuids::uuid id) {
+    header_.session_id = id;
+    header_.intra_session_id = UuidGen::Generate();
+  }
   uuids::uuid SessionId() const { return header_.session_id; }
   uuids::uuid IntraSessionId() const { return header_.intra_session_id; }
 
