@@ -33,6 +33,7 @@ struct DataHeader {
   void SetTimeToNow();
 
   uuids::uuid session_id = UuidGen::Generate();
+  uuids::uuid intra_session_id = UuidGen::Generate();
   std::string name;
   uint32_t version = 1;
   uint min, max;

@@ -31,6 +31,8 @@ class Sensor {
   virtual ~Sensor() = default;
   void SetSessionId(uuids::uuid id) { header_.session_id = id; }
   uuids::uuid SessionId() const { return header_.session_id; }
+  void SetIntraSessionId(uuids::uuid id) { header_.intra_session_id = id; }
+  uuids::uuid IntraSessionId() const { return header_.intra_session_id; }
 
   tl::expected<void, std::string> Update(steady_time_point_t t);
   std::optional<DataFrameValue> GetLast() const { return last_; }

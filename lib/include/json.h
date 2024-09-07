@@ -91,6 +91,7 @@ namespace sensor_compress {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(DataHeader,          //
                                    name,                //
                                    session_id,          //
+                                   intra_session_id,    //
                                    version,             //
                                    min,                 //
                                    max,                 //
