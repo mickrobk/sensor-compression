@@ -28,7 +28,9 @@ struct DataHeader {
   }
 
   DataHeader();
+  DataHeader(std::string_view name, uint min, uint max, uint resolution_bits);
   DataHeader(uint min, uint max, uint resolution_bits);
+  DataHeader(std::string_view name, uint min, uint max);
   DataHeader(uint min, uint max);
   void SetTimeToNow();
 
@@ -38,7 +40,7 @@ struct DataHeader {
   uint32_t version = 1;
   uint min, max;
   uint8_t resolution_bits;
-  size_t frame_size = 10000;
+  size_t frame_size = 1000;
   std::vector<CompressionType> value_compressions;
   std::vector<CompressionType> time_compressions;
   utc_time_point_t start_time_utc;
