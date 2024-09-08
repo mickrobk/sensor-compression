@@ -34,6 +34,7 @@ class Sensor {
     header_.session_id = id;
     header_.intra_session_id = UuidGen::Generate();
   }
+  std::string_view Name() const { return header_.name; }
   uuids::uuid SessionId() const { return header_.session_id; }
   uuids::uuid IntraSessionId() const { return header_.intra_session_id; }
 
