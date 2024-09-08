@@ -11,7 +11,10 @@ tl::expected<void, std::string> Sensor::MaybeCompressCurrent(bool force) {
     auto compressed_current = current_frame_.Compress(header_);
     current_frame_.Clear();
     if (!compressed_current) return tl::unexpected{compressed_current.error()};
-    compressed_values_.push_back(std::move(compressed_current.value()));
+    {
+      std::lock_guard lock(mutex_);
+      compressed_values_.push_back(std::move(compressed_current.value()));
+    }
     header_.SetTimeToNow();
   }
   return {};
@@ -39,8 +42,11 @@ tl::expected<CompressedSensorReadings, std::string> Sensor::TakeHistory(bool flu
   }
   CompressedSensorReadings readings;
   readings.header = header_;
-  readings.frames = std::move(compressed_values_);
-  compressed_values_.clear();
+  {
+    std::lock_guard lock(mutex_);
+    readings.frames = std::move(compressed_values_);
+    compressed_values_.clear();
+  }
   header_.intra_session_id = UuidGen::Generate();
   return readings;
 }

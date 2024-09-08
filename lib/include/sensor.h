@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <tl/expected.hpp>
 
@@ -39,17 +40,23 @@ class Sensor {
   tl::expected<void, std::string> Update(steady_time_point_t t);
   std::optional<DataFrameValue> GetLast() const { return last_; }
 
+  // threadsafe
   tl::expected<CompressedSensorReadings, std::string> TakeHistory(bool flush = true);
 
  protected:
   virtual std::optional<DataFrameValue> GetValue(steady_time_point_t t) = 0;
-  const std::vector<CompressedDataFrame>& CompressedValues() const { return compressed_values_; }
+  const std::vector<CompressedDataFrame>& CompressedValues() const {
+    std::lock_guard lock(mutex_);
+    return compressed_values_;
+  }
   tl::expected<void, std::string> MaybeCompressCurrent(bool force);
 
  private:
   DataFrameValue last_;
   DataHeader header_;
   DataFrame current_frame_;
+
+  mutable std::mutex mutex_;
   std::vector<CompressedDataFrame> compressed_values_;
 };
 
